@@ -35,7 +35,6 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           images: ${{ env.REGISTRY }}/dyneth-${{ matrix.context }}
-          context: ./devops/${{ matrix.context }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
