@@ -1,9 +1,5 @@
 FROM golang:1.17-alpine as builder
 
-LABEL org.opencontainers.image.authors="Denis Roio <jaromil@dyne.org>, Puria Nafisi Azizi <puria@dyne.org>" \
-      org.opencontainers.image.url="https://eth.dyne.org" \
-      org.opencontainers.image.title="Dyneth Signer container"
-
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 ENV GO111MODULE on
