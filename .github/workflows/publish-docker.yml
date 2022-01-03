@@ -12,7 +12,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-push-image:
@@ -34,9 +33,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.REGISTRY }}/dyneth-${{ matrix.context }}
-          flavor: |
-            prefix: ${{ matrix.context }}-
+          images: ${{ env.REGISTRY }}/dyne/dyneth-${{ matrix.context }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
