@@ -14,16 +14,10 @@ jaromil_enr="enr:-KO4QAUZfSPdt4k60kfdLmTtBjb2oq1xHb3StF_Vnsl7nx_ndWocmvgpYB93flE
 puria_ip="65.21.184.16"
 puria_enr="enr:-KO4QM73KhJg7FIoILVvCc2pgBategeHDaBuH3uah9jAmP_va3WNsWvcsLE7Kv36jqzkjSSIzptaP9N1i-rJdPPo_EuGAX4g0Ctkg2V0aMfGhPXJWWKAgmlkgnY0gmlwhEEVuBCJc2VjcDI1NmsxoQL3pEu27fEvOJfNUUqxVkninXJ-gw6MS4YvIrKDtptmsYRzbmFwwIN0Y3CCdl-DdWRwgnZf"
 
-if [ "$1" = "signer" ]; then
-    geth --networkid 1146703429 \
-	 --nat extip:$(curl -s https://ifconfig.me/ip) \
-	 --config /etc/geth.conf --syncmode "full" \
-	 --unlock $pub --mine \
-	 --bootnodes ${andrea_enr},${jaromil_enr},${puria_enr}
-else # api
-    geth --networkid 1146703429 \
-	 --nat extip:$(curl -s https://ifconfig.me/ip) \
-	 --config /etc/geth.conf --syncmode "snap" \
-	 --http --http.vhosts '*' --http.api web3,eth \
-	 --bootnodes ${andrea_enr},${jaromil_enr},${puria_enr}
-fi
+geth --networkid 1146703429 \
+     --datadir /var/lib/dyneth \
+     --ipcpath geth.ipc \
+     --nat extip:$(curl -s https://ifconfig.me/ip) \
+     --syncmode "snap" \
+     --http --http.vhosts '*' --http.api web3,eth \
+     --bootnodes ${andrea_enr},${jaromil_enr},${puria_enr}
