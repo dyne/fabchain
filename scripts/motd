@@ -26,11 +26,7 @@ if [ $found = 0 ]; then
     echo "try: make account"
     exit 0
 fi
-	     cat <<EOF | zenroom -a $acctpath 2> /dev/null >&2
-conf=JSON.decode(DATA)
-print('PUBLIC ADDRESS: 0x'..conf.address)
-print''
--- print('Genesis extradata:')
--- print('0x'..O.zero(32):hex()..conf.address..O.zero(65):hex())
-EOF
+eval hexpk=`cat $acctpath | awk -F: '/address/ {print $2}' RS=,`
+echo "Public address: $hexpk" >&2
+echo
 

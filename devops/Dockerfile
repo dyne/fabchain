@@ -17,8 +17,10 @@ RUN go get -d github.com/ethereum/go-ethereum@v$GETH_VERSION \
 FROM alpine:latest
 RUN apk add --no-cache ca-certificates curl
 COPY --from=builder /go/bin/* /usr/local/bin/
-COPY ./conf/geth-genesis.conf /etc/genesis.conf
-COPY ./scripts/start-geth-api.sh /
+COPY genesis.conf /etc/dyneth/genesis.conf
+COPY init-geth.sh /
+COPY start-geth-api.sh /
+COPY start-geth-signer.sh /
 
 EXPOSE 8545 8546 30303 30303/udp
 
