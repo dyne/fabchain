@@ -36,7 +36,6 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
           labels: |
-            org.opencontainers.image.title=Dyneth ${{ matrix.context }} container
             org.opencontainers.image.authors=Denis Roio <jaromil@dyne.org>, Puria Nafisi Azizi <puria@dyne.org>
             org.opencontainers.image.vendor=Dyne.org
 
