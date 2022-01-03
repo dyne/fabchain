@@ -20,10 +20,11 @@ jobs:
     permissions:
       contents: read
       packages: write
-    matrix:
-      context:
-        - api
-        - signer
+    strategy:
+      matrix:
+        context:
+          - api
+          - signer
 
     steps:
       - name: Checkout repository
