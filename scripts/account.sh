@@ -1,11 +1,6 @@
 #!/bin/bash
 
-bash ./scripts/motd
-
 R=${HOME}/.dyneth
-umask 077
-mkdir -p ${R}/log
-touch ${R}/.keep || exit 1
 
 function empty() {
     if [[ -r ${R}/keys ]]; then
@@ -28,7 +23,7 @@ function blink() {
     printf "\033[5m${1}\033[0m\n"
 }
 function geth() {
-    docker run -it -p 30303:30303/tcp -p 30303:30303/udp \
+    docker run -it \
 	   --mount type=bind,source=${R},destination=/var/lib/dyneth \
 	   dyne/dyneth \
 	   setuidgid dyneth geth $* \

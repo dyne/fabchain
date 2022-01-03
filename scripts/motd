@@ -4,6 +4,7 @@
 R=${HOME}/.dyneth
 umask 077
 mkdir -p ${R}
+touch ${R}/.keep || exit 1
 
 cat <<EOF
 
@@ -12,3 +13,24 @@ cat <<EOF
 ░▀▀░░░▀░░▀░▀░▀▀▀░░▀░░▀░▀
 
 EOF
+
+found=0
+if [ -d ${R}/keys ]; then
+    acctpath=`find ${R}/keys/ -type f`
+    if [ ! "$acctpath" = "" ]; then
+	found=1
+    fi
+fi
+if [ $found = 0 ]; then
+    echo "No account created"
+    echo "try: make account"
+    exit 0
+fi
+	     cat <<EOF | zenroom -a $acctpath 2> /dev/null
+conf=JSON.decode(DATA)
+print('PUBLIC ADDRESS: 0x'..conf.address)
+print''
+-- print('Genesis extradata:')
+-- print('0x'..O.zero(32):hex()..conf.address..O.zero(65):hex())
+EOF
+
