@@ -6,7 +6,7 @@ umask 077
 mkdir -p ${R}/log
 touch ${R}/.keep || exit 1
 
-cat <<EOF
+cat >&2 <<EOF
 
 ░█▀▄░█░█░█▀█░█▀▀░▀█▀░█░█
 ░█░█░░█░░█░█░█▀▀░░█░░█▀█
@@ -26,7 +26,7 @@ if [ $found = 0 ]; then
     echo "try: make account"
     exit 0
 fi
-	     cat <<EOF | zenroom -a $acctpath 2> /dev/null
+	     cat <<EOF | zenroom -a $acctpath 2> /dev/null >&2
 conf=JSON.decode(DATA)
 print('PUBLIC ADDRESS: 0x'..conf.address)
 print''
