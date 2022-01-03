@@ -1,9 +1,9 @@
 FROM dyne/devuan:chimaera
 ENV debian bullseye
 
-LABEL authors="Denis Roio <jaromil@dyne.org>, Puria Nafisi Azizi <puria@dyne.org>" \
-	  url="https://eth.dyne.org"  \
-      title="Dyneth Signer container"
+LABEL org.opencontainers.image.authors="Denis Roio <jaromil@dyne.org>, Puria Nafisi Azizi <puria@dyne.org>" \
+      org.opencontainers.image.url="https://eth.dyne.org" \
+      org.opencontainers.image.title="Dyneth Signer container"
 
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
@@ -12,8 +12,8 @@ ENV GETH_VERSION 1.10.14
 ENV GO_VERSION 1.17
 
 RUN apt-get update -y -q \
-	&& apt-get install -y -q gcc build-essential supervisor daemontools curl \
-	&& apt-get -y -q autoremove && apt-get -y -q clean
+    && apt-get install -y -q gcc build-essential supervisor daemontools curl \
+    && apt-get -y -q autoremove && apt-get -y -q clean
 
 RUN wget -q https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz \
     && tar -zxf go${GO_VERSION}.linux-amd64.tar.gz -C /usr/local/ \
