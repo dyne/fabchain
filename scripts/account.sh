@@ -3,8 +3,9 @@
 bash ./scripts/motd
 
 R=${HOME}/.dyneth
-mkdir -p ${R}
-umask 022
+umask 077
+mkdir -p ${R}/log
+touch ${R}/.keep || exit 1
 
 function empty() {
     if [[ -r ${R}/keys ]]; then
@@ -27,58 +28,58 @@ function blink() {
     printf "\033[5m${1}\033[0m\n"
 }
 function geth() {
-    docker run -it --mount \
-	   type=bind,source=${HOME}/.dyneth,destination=/var/lib/dyneth \
-	   dyne/dyneth:latest \
-	   setuidgid dyneth geth account $* \
+    docker run -it -p 30303:30303/tcp -p 30303:30303/udp \
+	   --mount type=bind,source=${R},destination=/var/lib/dyneth \
+	   dyne/dyneth \
+	   setuidgid dyneth geth $* \
 	   --datadir /var/lib/dyneth \
 	   --keystore /var/lib/dyneth/keys
 }    
+function pk() {
+    conf=${1:-`find ${R}/keys/ -type f`}
+    echo "print(JSON.decode(DATA).address)" | zenroom -a $conf 2> /dev/null
+}
+
+# main()
 case "$1" in
     new) empty
-	 geth new
+	 geth account new
+	 conf=`find ${R}/keys/ -type f`
+	 addr=`pk $conf`
+	 mv $conf ${R}/keys/$addr
 	 ;;
 
+    address) have
+	     conf=`find ${R}/keys/ -type f`
+	     cat <<EOF | zenroom -a $conf 2> /dev/null
+conf=JSON.decode(DATA)
+print('PUBLIC ADDRESS:')
+print(' 0x'..conf.address)
+print('Genesis extradata:')
+print('0x'..O.zero(32):hex()..conf.address..O.zero(65):hex())
+EOF
+	     ;;
+
+    mine) have
+	  geth --unlock `pk` --mine
+	  ;;
+
     backup) have
-	    eval hexsk=`cat ${R}/keys/* | awk -F: '/ciphertext/ {print $2}' RS=,`
-	    basesk=`echo "print(O.from_hex(trimq('$hexsk')):base58())" | zenroom 2>/dev/null`
-	    printf "YOUR SECRET KEY:\n \033[5m$basesk\033[0m"
-	    echo
-	    if command -v qrencode >/dev/null; then
-		echo
-		echo $basesk | qrencode -t ANSI256
-	    fi
+	    cat ${R}/keys/*
+	    echo ; echo
 	    ;;
 
-    restore) have
+    restore) empty
 	     echo "TYPE YOUR SECRET KEY:"
 	     read basesk
-	     if [[ "$basesk" == "" ]]; then
-		 echo "ERROR: EMPTY KEY"
-		 exit 1
-	     fi
-	     err=`mktemp`
-	     lua=`mktemp`
-	     cat <<EOF > $lua
-sk = O.from_base58(trim('${basesk}'))
-if #sk ~= 32 then
-   error("invalid key length: ".. #sk .. "bytes")
-end
-EOF
-	    sk=`zenroom $lua 2>$err`
-	    if [[ $? == 1 ]]; then
-		cat $err
-		rm -f $err $lua
-		echo
-		exit 1
-	    else
-		echo
-		echo "SECRET KEY RECOGNIZED:"
-		echo " $sk"
-	    fi
-	    echo "$sk" > $R/keys/.sk
-	    geth import  /var/lib/dyneth/keys/.sk
-	    rm -f        $R/keys/.sk
-	    echo
+	     tmp=`mktemp`
+	     echo "$basesk" > $tmp
+	     addr=`pk $tmp`
+	     mkdir -p ${R}/keys/
+	     echo $basesk > ${R}/keys/${addr}
+	     echo "KEY RESTORED: $addr"
+	     ls -l ${R}/keys/${addr}
+	     rm -f $tmp
+	     echo
 	    ;;	    
 esac

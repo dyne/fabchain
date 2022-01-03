@@ -23,12 +23,15 @@ RUN go get -d github.com/ethereum/go-ethereum@v$GETH_VERSION \
     && cd go/pkg/mod/github.com/ethereum/go-ethereum@v$GETH_VERSION \
     && go install ./...
 
-RUN apt-get install -y -q supervisor daemontools \
+RUN apt-get install -y -q supervisor daemontools curl \
     && mkdir -p  /var/lib/dyneth/log /var/lib/dyneth/keys /var/lib/dyneth/data \
     && useradd -d /var/lib/dyneth dyneth \
-    && chown -R dyneth:dyneth /var/lib/dyneth
+    && chown -R dyneth:dyneth /var/lib/dyneth \
+    && echo "PS1='ⓓⓨⓝⓔⓣⓗ # '" >> /root/.bashrc
 
 COPY ./conf/supervisord.conf /etc/supervisor/supervisord.conf
 COPY ./conf/geth.conf /etc/geth.conf
+COPY ./conf/geth-genesis.conf /etc/genesis.conf
+COPY ./scripts/start-geth.sh /usr/local/bin/start-geth.sh
 
 CMD supervisord -c /etc/supervisor/supervisord.conf

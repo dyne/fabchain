@@ -1,3 +1,10 @@
+#!/bin/sh
+
+# opens a shell in a running dyneth docker
+R=${HOME}/.dyneth
+umask 077
+mkdir -p ${R}
+
 cat <<EOF
 
 ░█▀▄░█░█░█▀█░█▀▀░▀█▀░█░█
