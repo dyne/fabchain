@@ -3,7 +3,7 @@
 # opens a shell in a running dyneth docker
 R=${HOME}/.dyneth
 umask 077
-mkdir -p ${R}
+mkdir -p ${R}/log
 touch ${R}/.keep || exit 1
 
 cat <<EOF
