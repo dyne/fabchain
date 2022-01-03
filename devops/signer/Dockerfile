@@ -29,7 +29,7 @@ RUN go get -d github.com/ethereum/go-ethereum@v$GETH_VERSION \
 RUN mkdir -p  /var/lib/dyneth/log /var/lib/dyneth/keys /var/lib/dyneth/data \
     && useradd -d /var/lib/dyneth dyneth \
     && chown -R dyneth:dyneth /var/lib/dyneth \
-    && echo "PS1='ⓓⓨⓝⓔⓣⓗ # '" >> /root/.bashrc
+    && echo "PS1='🅳 🆈 🅽 🅴 🆃 🅷 # '" >> /root/.bashrc
 
 
 COPY ./conf/supervisord.conf /etc/supervisor/supervisord.conf
