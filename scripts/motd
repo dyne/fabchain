@@ -15,8 +15,8 @@ cat >&2 <<EOF
 EOF
 
 found=0
-if [ -d ${R}/keys ]; then
-    acctpath=`find ${R}/keys/ -type f`
+if [ -d ${R}/keystore ]; then
+    acctpath=`find ${R}/keystore/ -type f`
     if [ ! "$acctpath" = "" ]; then
 	found=1
     fi

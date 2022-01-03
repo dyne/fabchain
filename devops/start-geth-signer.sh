@@ -1,8 +1,8 @@
 #!/bin/sh
 
 found=0
-if [ -r /var/lib/dyneth/keys ]; then
-    kpath=`find /var/lib/dyneth/keys -type f`
+if [ -r /var/lib/dyneth/keystore ]; then
+    kpath=`find /var/lib/dyneth/keystore -type f`
     if [ ! "x$kpath" = "x" ]; then
 	if [ -r "$kpath" ]; then
 	    found=1
@@ -10,7 +10,7 @@ if [ -r /var/lib/dyneth/keys ]; then
     fi
 fi
 if [ $found = 0 ]; then
-    echo "Signer keys not found in /var/lib/dyneth/keys"
+    echo "Signer keys not found in /var/lib/dyneth/keystore"
     exit 1
 fi
 
