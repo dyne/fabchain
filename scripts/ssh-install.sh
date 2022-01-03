@@ -15,4 +15,12 @@ echo "Installing Docker"
 scp ./scripts/docker-install.sh $H:
 ssh $H bash docker-install.sh
 
+echo "Installing Zenroom"
+ssh $H curl -o /usr/local/bin/zenroom \
+    https://files.dyne.org/zenroom/nightly/zenroom-linux-amd64 
+ssh $H chmod +x /usr/local/bin/zenroom
+
+echo "Installing git and make"
+ssh $H bash ./apt.sh install git make
+
 echo "Installation completed, please reboot $H"
