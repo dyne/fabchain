@@ -1,8 +1,9 @@
 FROM dyne/devuan:chimaera
 ENV debian bullseye
 
-LABEL maintainer="Denis Roio <jaromil@dyne.org>" \
-	  homepage="https://eth.dyne.org"
+LABEL authors="Denis Roio <jaromil@dyne.org>, Puria Nafisi Azizi <puria@dyne.org>" \
+	  url="https://eth.dyne.org"  \
+      title="Dyneth Signer container"
 
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
