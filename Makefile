@@ -19,7 +19,7 @@ all:
 	 echo " make run-signer - start the SIGNER node with current account" ;\
 	 echo
 	@echo "Development commands:" ;\
-	 echo " make debug - run an interactive shell inside the node" ;\
+	 echo " make debug - run a shell in a new interactive container (no daemons)" ;\
 	 echo " make build - build the local ./Dockerfile as dyne/dyneth:latest" ;\
 	 echo
 
@@ -40,7 +40,7 @@ build:
 	make -C devops
 
 build-release:
-	VERSION=${VERSION} make -C devops
+	make -C devops
 
 run:	init stopped
 run:
@@ -48,7 +48,7 @@ run:
 	docker run --restart unless-stopped -d \
 	 -p ${P2P_PORT}:${P2P_PORT}/tcp \
 	 -p ${P2P_PORT}:${P2P_PORT}/udp -p ${API_PORT}:${API_PORT} \
-	 dyne/dyneth sh /start-geth-api.sh
+	 ${DOCKER} sh /start-geth-api.sh
 	@echo "P2P networking through port 30303"
 	@echo "HTTP API available at port 8545"
 	@echo "run 'make shell' for an interactive console" && echo
@@ -80,7 +80,7 @@ run-signer:
 	docker run -it \
 	--mount type=bind,source=${DATA},destination=/var/lib/dyneth \
 	 -p ${P2P_PORT}:${P2P_PORT}/tcp -p ${P2P_PORT}:${P2P_PORT}/udp \
-	 dyne/dyneth sh /start-geth-signer.sh
+	 ${DOCKER} sh /start-geth-signer.sh
 	@echo "P2P networking through port ${P2P_PORT}"
 	@echo "run 'make shell' for an interactive console" && echo
 
@@ -113,4 +113,9 @@ debug:
 	docker run -it -p ${P2P_PORT}:${P2P_PORT}/tcp \
 	 -p ${P2P_PORT}:${P2P_PORT}/udp -p ${API_PORT}:${API_PORT} \
 	 --mount type=bind,source=${DATA},destination=/var/lib/dyneth \
-	 dyne/dyneth sh
+	 ${DOCKER} sh
+
+# only for developers
+push:
+	git push
+	docker push dyne/dyneth:${VERSION}
