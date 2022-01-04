@@ -15,7 +15,10 @@ RUN go get -d github.com/ethereum/go-ethereum@v$GETH_VERSION \
     && go install ./...
 
 FROM alpine:latest
-RUN apk add --no-cache ca-certificates curl
+RUN apk add --no-cache ca-certificates curl awk
+RUN curl -o /usr/local/bin/zenroom \
+    https://files.dyne.org/zenroom/nightly/zenroom-linux-amd64 \
+    && chmod +x /usr/local/bin/zenroom
 COPY --from=builder /go/bin/* /usr/local/bin/
 COPY genesis.conf /etc/dyneth/genesis.conf
 COPY init-geth.sh /
