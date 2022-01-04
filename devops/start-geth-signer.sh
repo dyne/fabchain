@@ -19,10 +19,11 @@ echo "Public address: $hexpk" >&2
 echo
 . /init-geth.sh
 
-geth --networkid 1146703429 \
+geth --networkid ${CONF_NETWORK_ID} \
      --datadir /var/lib/dyneth \
      --ipcpath geth.ipc \
      --nat extip:${pubip} \
+     --port ${CONF_P2P_PORT} --nodiscover \
      --syncmode "full" \
      --unlock $hexpk --mine \
      --bootnodes ${andrea_enr},${jaromil_enr},${puria_enr}

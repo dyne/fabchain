@@ -15,8 +15,9 @@ RUN go get -d github.com/ethereum/go-ethereum@v$GETH_VERSION \
     && go install ./...
 
 FROM alpine:latest
-RUN apk add --no-cache ca-certificates curl awk
-RUN curl -o /usr/local/bin/zenroom \
+
+RUN apk add --no-cache ca-certificates curl mawk
+RUN curl -so /usr/local/bin/zenroom \
     https://files.dyne.org/zenroom/nightly/zenroom-linux-amd64 \
     && chmod +x /usr/local/bin/zenroom
 COPY --from=builder /go/bin/* /usr/local/bin/
@@ -25,6 +26,15 @@ COPY init-geth.sh /
 COPY start-geth-api.sh /
 COPY start-geth-signer.sh /
 
-EXPOSE 8545 8546 30303 30303/udp
+ARG VERSION
+ENV VERSION $VERSION
+ARG NETWORK_ID
+ENV CONF_NETWORK_ID $NETWORK_ID
+ARG P2P_PORT
+ENV CONF_P2P_PORT $P2P_PORT
+ARG API_PORT
+ENV CONF_API_PORT $API_PORT
+
+EXPOSE $CONF_API_PORT $CONF_P2P_PORT $CONF_P2P_PORT/udp
 
 CMD sh /start-geth-api.sh

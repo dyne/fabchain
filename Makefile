@@ -1,10 +1,13 @@
-
-VERSION ?= 0.2
 HOME ?= $(shell pwd)
 
+include config.mk
+
+export
+
 all:
+	@echo "Dyneth ${VERSION}" && echo
 	@echo "Server commands:" ;\
-	 echo " make run - start the API node listening on HTTP port 8545" ;\
+	 echo " make run - start the API node listening on HTTP port ${API_PORT}" ;\
 	 echo " make shell - open a shell inside running server (CMD=sh or custom)" ;\
 	 echo " make status - see if server is running and print public address" ;\
 	 echo " make stop - stop running server" ;\
@@ -43,7 +46,8 @@ run:	init stopped
 run:
 	@echo "Launching docker container for the HTTP API service:"
 	docker run --restart unless-stopped -d \
-	 -p 30303:30303/tcp -p 30303:30303/udp -p 8545:8545 \
+	 -p ${P2P_PORT}:${P2P_PORT}/tcp \
+	 -p ${P2P_PORT}:${P2P_PORT}/udp -p ${API_PORT}:${API_PORT} \
 	 dyne/dyneth sh /start-geth-api.sh
 	@echo "P2P networking through port 30303"
 	@echo "HTTP API available at port 8545"
@@ -74,10 +78,10 @@ run-signer: init stopped
 run-signer:
 	@echo "Launching docker container for the SIGNING service:"
 	docker run -it \
-	--mount type=bind,source=${HOME}/.dyneth,destination=/var/lib/dyneth \
-	 -p 30303:30303/tcp -p 30303:30303/udp \
+	--mount type=bind,source=${DATA},destination=/var/lib/dyneth \
+	 -p ${P2P_PORT}:${P2P_PORT}/tcp -p ${P2P_PORT}:${P2P_PORT}/udp \
 	 dyne/dyneth sh /start-geth-signer.sh
-	@echo "P2P networking through port 30303"
+	@echo "P2P networking through port ${P2P_PORT}"
 	@echo "run 'make shell' for an interactive console" && echo
 
 account: init
@@ -102,10 +106,11 @@ status:
 
 debug:	init stopped
 debug:
-	@echo "P2P networking through port 30303"
-	@echo "HTTP API available at port 8545"
+	@echo "P2P networking through port ${P2P_PORT}"
+	@echo "HTTP API available at port ${API_PORT}"
 	@echo "Data storage in ~/.dyneth" && echo
 	@echo "Debugging docker container:"
-	docker run -it -p 30303:30303/tcp -p 30303:30303/udp -p 8545:8545 \
-	 --mount type=bind,source=${HOME}/.dyneth,destination=/var/lib/dyneth \
+	docker run -it -p ${P2P_PORT}:${P2P_PORT}/tcp \
+	 -p ${P2P_PORT}:${P2P_PORT}/udp -p ${API_PORT}:${API_PORT} \
+	 --mount type=bind,source=${DATA},destination=/var/lib/dyneth \
 	 dyne/dyneth sh
