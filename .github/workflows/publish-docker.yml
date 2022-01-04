@@ -52,6 +52,9 @@ jobs:
         if: github.event_name != 'pull_request'
         with:
           context: ./devops/
+          buildArgs:
+            - P2P_PORT: 30303
+            - API_PORT: 8545
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
