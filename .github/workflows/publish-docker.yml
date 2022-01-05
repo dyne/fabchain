@@ -50,10 +50,10 @@ jobs:
       - name: Parse config
         id: conf
         run: |
-          args = $(cat config.mk | awk -F" := " '!/^#/ && length($1) > 0 {print $1"="$2}')
-          args = "${args//'%'/'%25'}"
-          args = "${args//$'\n'/'%0A'}"
-          args = "${args//$'\r'/'%0D'}"
+          args=$(cat config.mk | awk -F" := " '!/^#/ && length($1) > 0 {print $1"="$2}')
+          args="${args//'%'/'%25'}"
+          args="${args//$'\n'/'%0A'}"
+          args="${args//$'\r'/'%0D'}"
           echo $args
           echo ::set-output name=buildargs::$args
 
