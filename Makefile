@@ -108,6 +108,9 @@ account: init
 backup: init
 	@bash ./scripts/account.sh backup
 
+backup-secret: init
+	@sh ./scripts/secret.sh
+
 restore: init
 	@bash ./scripts/account.sh restore
 
