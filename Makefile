@@ -36,18 +36,34 @@ running:
 	@if [ "x${container}" = "x" ]; then \
 		echo "Container is not running"; echo; exit 1; fi
 
+upnp-open: upnpc=$(shell which upnpc)
+upnp-open:
+	@if [ "x${upnpc}" = "x" ]; then \
+	 echo "UPNP client not found, unable to open P2P port forwarding" ;\
+	else \
+	 sh ./scripts/upnp.sh open ${P2P_PORT} tcp ;\
+	 sh ./scripts/upnp.sh open ${P2P_PORT} udp ;\
+	fi
+
+upnp-close: upnpc=$(shell which upnpc)
+upnp-close:
+	@if [ "x${upnpc}" = "x" ]; then \
+	 echo "UPNP client not found, unable to close P2P port forwarding" ;\
+	else \
+	 sh ./scripts/upnp.sh close ${P2P_PORT} tcp ;\
+	 sh ./scripts/upnp.sh close ${P2P_PORT} udp ;\
+	fi
+
 build:
 	make -C devops
 
 build-release:
 	make -C devops
 
-run:	init stopped
+run:	init stopped upnp-open
 run:
 	@echo "Launching docker container for the HTTP API service:"
-	docker run --restart unless-stopped -d \
-	 -p ${P2P_PORT}:${P2P_PORT}/tcp \
-	 -p ${P2P_PORT}:${P2P_PORT}/udp -p ${API_PORT}:${API_PORT} \
+	@docker run --restart unless-stopped -d \
 	 ${DOCKER} sh /start-geth-api.sh
 	@echo "P2P networking through port 30303"
 	@echo "HTTP API available at port 8545"
@@ -58,10 +74,12 @@ console:
 	echo "Console starting" && echo
 	docker exec -it ${container} geth attach /var/lib/dyneth/geth.ipc
 
-stop:	init running
+stop:	init running upnp-close
 stop:
 	@echo "Stopping container: ${container}"
-	docker container stop ${container}
+	@docker container stop ${container}
+	@sh ./scripts/upnp.sh close ${P2P_PORT} tcp ;\
+	 sh ./scripts/upnp.sh close ${P2P_PORT} udp
 
 shell:	init running
 shell:	CMD ?= "sh"
@@ -74,10 +92,10 @@ shell:
 
 # SIGNER
 
-run-signer: init stopped
+run-signer: init stopped upnp-open
 run-signer:
 	@echo "Launching docker container for the SIGNING service:"
-	docker run -it \
+	@docker run -it \
 	--mount type=bind,source=${DATA},destination=/var/lib/dyneth \
 	 -p ${P2P_PORT}:${P2P_PORT}/tcp -p ${P2P_PORT}:${P2P_PORT}/udp \
 	 ${DOCKER} sh /start-geth-signer.sh
