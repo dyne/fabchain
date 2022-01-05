@@ -49,7 +49,7 @@ jobs:
 
       - name: Parse config
         id: conf
-        run: echo ::set-output name=buildargs::$(cat config.mk | awk -F" := " '!/^#/ && length($1) > 0 {print $1"="$2}' | paste -sd ',')
+        run: echo ::set-output name=buildargs::$(cat config.mk | awk -F" := " '!/^#/ && length($1) > 0 {print $1"="$2}')
 
       - name: Show args
         run: echo ${{ steps.conf.outputs.buildargs }}
@@ -59,7 +59,7 @@ jobs:
         if: github.event_name != 'pull_request'
         with:
           context: ./devops/
-          buildargs: ${{ steps.conf.outputs.buildargs }}
+          build-args: ${{ steps.conf.outputs.buildargs }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
