@@ -1,4 +1,5 @@
-#!/bin/sh
+# execute using make from parent directory
+# requires sh
 
 # opens a shell in a running dyneth docker
 R=${HOME}/.dyneth
