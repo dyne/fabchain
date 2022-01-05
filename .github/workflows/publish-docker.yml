@@ -47,14 +47,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Parse config
+        id: conf
+        run: echo ::set-output name=buildargs::$(cat config.mk | awk -F" := " '!/^#/ && length($1) > 0 {print $1"="$2}' | paste -sd ',')
+
+      - name: Show args
+        run: echo ${{ steps.conf.outputs.buildargs }}
+
       - name: Build and push Docker image 
         uses: docker/build-push-action@v2
         if: github.event_name != 'pull_request'
         with:
           context: ./devops/
-          buildArgs:
-            - P2P_PORT: 30303
-            - API_PORT: 8545
+          buildargs: ${{ steps.conf.outputs.buildargs }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
