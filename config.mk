@@ -1,6 +1,6 @@
 # DYNETH configuration
 
-VERSION := 0.4
+VERSION := 0.4.1
 DOCKER := ghcr.io/dyne/dyneth:${VERSION}
 NETWORK_ID := 1146703429
 P2P_PORT := 30303

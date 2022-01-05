@@ -11,7 +11,7 @@ issued by the Makefile and therefore prefixed by `make`
 
 ```
 Server commands:
- make run - start the API node listening on HTTP port 8545
+ make run - start the API node listening on HTTP
  make shell - open a shell inside running server (CMD=sh or custom)
  make status - see if server is running and print public address
  make stop - stop running server
@@ -24,7 +24,7 @@ Account commands:
 
 Development commands:
  make debug - run a shell in a new interactive container (no daemons)
- make build - build the local ./Dockerfile as dyne/dyneth:latest
+ make build - build the local ./Dockerfile as dyne/dyneth:VERSION
 ```
 
 # Requirements
