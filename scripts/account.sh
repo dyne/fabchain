@@ -1,4 +1,5 @@
-#!/bin/bash
+# execute using make from parent directory
+# requires bash
 
 R=${DATA}
 

@@ -35,7 +35,7 @@ ssh $H curl -o /usr/local/bin/zenroom \
     https://files.dyne.org/zenroom/nightly/zenroom-linux-amd64 
 ssh $H chmod +x /usr/local/bin/zenroom
 
-echo "Installing git and make"
-ssh $H bash ./apt.sh install git make
+echo "Installing git, make, upnpc"
+ssh $H bash ./apt.sh install git make miniupnpc
 
 echo "Installation completed, please reboot $H"
