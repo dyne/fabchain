@@ -1,0 +1,58 @@
+FROM devuan-chimaera:latest
+
+# image based on: 
+# https://ci.free2air.net/job/Images/job/rpi-img-builder/job/rpi-3-devuan-chimaera-arm64/
+# how to use:
+#
+# wget https://ci.free2air.net/job/Docker/job/docker-devuan-chimaera-arm64/lastSuccessfulBuild/artifact/docker-devuan-chimaera-arm64.tar 
+# docker image load --input docker-devuan-chimaera-arm64.tar
+# 
+# to test if it works: 
+# docker run devuan-chimaera cat /etc/devuan_version
+# 
+
+LABEL maintainer="Denis Roio <jaromil@dyne.org>" \
+	  homepage="https://eth.dyne.org"
+
+ENV LC_ALL C.UTF-8
+ENV LANG C.UTF-8
+ENV GO111MODULE on
+ENV GETH_VERSION 1.10.14
+ENV GOROOT /usr/local/bin/go
+ENV GOPATH /go
+ENV PATH $GOROOT/bin:$PATH
+
+RUN apt update
+RUN apt install -y -q gcc musl-dev git make ca-certificates curl mawk wget
+
+RUN wget https://go.dev/dl/go1.17.6.linux-arm64.tar.gz \
+	&& tar -xvf go1.17.6.linux-arm64.tar.gz -C /usr/local/bin \
+	&& mkdir /go
+
+RUN go get -d github.com/ethereum/go-ethereum@v$GETH_VERSION 
+
+RUN cd /go/pkg/mod/github.com/ethereum/go-ethereum@v$GETH_VERSION \
+  && go install ./...
+
+RUN curl -so /usr/local/bin/zenroom \
+    https://files.dyne.org/zenroom/nightly/zenroom-linux-aarch64 \
+    && chmod +x /usr/local/bin/zenroom
+
+RUN cp -r /go/bin/* /usr/local/bin/
+COPY genesis.conf /etc/dyneth/genesis.conf
+COPY init-geth.sh /
+COPY start-geth-api.sh /
+COPY start-geth-signer.sh /
+
+ARG VERSION
+ENV VERSION $VERSION
+ARG NETWORK_ID
+ENV CONF_NETWORK_ID $NETWORK_ID
+ARG P2P_PORT
+ENV CONF_P2P_PORT $P2P_PORT
+ARG API_PORT
+ENV CONF_API_PORT $API_PORT
+
+EXPOSE $CONF_API_PORT $CONF_P2P_PORT $CONF_P2P_PORT/udp
+# RUN chmod +x *.sh
+CMD sh /start-geth-api.sh
