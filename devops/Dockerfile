@@ -7,16 +7,18 @@ ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 ENV GO111MODULE on
 ENV GETH_VERSION 1.10.14
+ENV SOLC_VERSION 0.8.11
 
-RUN apk add --no-cache gcc musl-dev linux-headers git make
+RUN apk add --no-cache gcc g++ musl-dev linux-headers git make cmake \
+    boost-dev boost-static curl
 
 RUN go get -d github.com/ethereum/go-ethereum@v$GETH_VERSION \
     && cd pkg/mod/github.com/ethereum/go-ethereum@v$GETH_VERSION \
     && go install ./...
 
-# RUN apk add --no-cache cmake boost-dev c++
-# RUN git clone https://github.com/ethereum/solidity && cd solidity \
-#     && mkdir build && cd build && cmake .. && make
+RUN git clone https://github.com/ethereum/solidity \
+    && cd solidity && git checkout tags/v${SOLC_VERSION} \
+    && mkdir build && cd build && cmake .. && make solc && make install -C solc
 
 FROM alpine:latest
 
@@ -27,6 +29,7 @@ RUN curl -so /usr/local/bin/zenroom \
     https://files.dyne.org/zenroom/nightly/zenroom-linux-amd64 \
     && chmod +x /usr/local/bin/zenroom
 COPY --from=builder /go/bin/* /usr/local/bin/
+COPY --from=builder /usr/local/bin/solc /usr/local/bin
 COPY genesis.conf /etc/dyneth/genesis.conf
 COPY init-geth.sh /
 COPY start-geth-api.sh /
