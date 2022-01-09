@@ -19,7 +19,12 @@
 --GNU Affero General Public License v3.0
 --If not, see http://www.gnu.org/licenses/agpl.txt
 
--- initial gas amount given to signers
+-- Usage: zenroom genesis.lua -A <(`date +"%s"`)
+
+-- numerical ID of the chain
+chainid = 1146703429
+
+-- initial amount given to signers
 share = 1048576
 
 -- estimated using https://etherscan.io/chart/gaslimit
@@ -32,26 +37,38 @@ signers = { 'D77136c62F8d62793eaA6a5B26581630AEB4fe2F', -- j
 	  }
 
 -- clique seconds of threshold for confirmations
-period = 5
+period = 7
 
 -- END OF CONFIG
 
--- render extradata
-extradata = '0x'..O.zero(32):hex()
-for k,v in pairs(signers) do extradata = extradata .. k end
-extradata = extradata .. O.zero(65):hex()
-
--- render initial signer accounts
+-- sealer (aka signer) accounts
 accounts = { }
+
+-- fund precompiled contracts
+-- see go-ethereum/core/vm/contracts.go at line 51
+-- https://ethereum.stackexchange.com/questions/68056/puppeth-precompile-addresses
+-- https://ethereum.stackexchange.com/questions/440/whats-a-precompiled-contract-and-how-are-they-different-from-native-opcodes
+-- https://ethereum.stackexchange.com/questions/15479/list-of-pre-compiled-contracts
+nc = INT.new(1)
+for i=1,8 do
+   accounts['00000000000000000000000000000000000000'..nc:hex()]
+      = { balance = '0x1' }
+   nc = nc + INT.new(1)
+end
+
+-- render also extradata
+extradata = '0x'..O.zero(32):hex()
 for k,v in ipairs(signers) do
    accounts[v] = { balance = tostring(share) }
+   extradata = extradata .. v
 end
 
 genesis = {
    config = {
-      chainId= 1146703429,
+      chainId= chainid,
       homesteadBlock = 0,
       eip150Block = 0,
+      eip150Hash = '0x0000000000000000000000000000000000000000000000000000000000000000',
       eip155Block = 0,
       eip158Block = 0,
       byzantiumBlock = 0,
@@ -62,7 +79,11 @@ genesis = {
 	 epoch = 30000
       }
    },
-   difficulty = tostring(1),
+   timestamp = DATA,
+   nonce = '0x0',
+   difficulty = '0x1',
+   mixHash = '0x0000000000000000000000000000000000000000000000000000000000000000',
+   coinbase = '0x000000000000000000000000000000000000000',
    gasLimit = tostring(gaslimit),
    extradata = '0x'..extradata .. O.zero(65):hex(),
    alloc = accounts

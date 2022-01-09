@@ -122,6 +122,14 @@ status:
 		echo "Status: RUNNING" && echo ;\
 	fi
 
+# GENESIS
+# operate just once
+genesis: epoch := $(shell date +"%s")
+genesis: tmp := $(shell mktemp)
+genesis:
+	@echo -n ${epoch} > ${tmp}
+	@zenroom scripts/genesis.lua -a ${tmp}
+	@rm -f tmp
 
 # DEBUG
 
