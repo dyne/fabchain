@@ -1,7 +1,8 @@
 # extract ethereum's secret key from geth
 # needs pip install web3
 
-R=${DATA}
+. scripts/host-lib.sh
+
 keystore=`find ${R}/keystore/ -type f`
 
 tmp=`mktemp`
@@ -36,6 +37,6 @@ if [ ! $res = 0 ]; then
     echo && echo "Error: wrong password?" && echo
     exit 1
 else
-    echo && echo "Success extracting your secret key:"
+    echo && echo "Your secret key:"
 fi
 echo ${sk} && echo

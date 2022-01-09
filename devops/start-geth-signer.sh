@@ -17,7 +17,8 @@ fi
 eval hexpk=`cat $kpath | awk -F: '/address/ {print $2}' RS=,`
 echo "Public address: $hexpk" >&2
 echo
-. /init-geth.sh
+
+. /init-geth.sh $1
 
 geth --networkid ${CONF_NETWORK_ID} \
      --datadir /var/lib/dyneth \

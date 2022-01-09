@@ -1,8 +1,8 @@
 #!/bin/sh
 
-if [ ! -r /var/lib/dyneth/geth/LOCK ]; then
-    geth init --datadir /var/lib/dyneth /etc/genesis.conf
-fi
+# if [ ! -r /var/lib/dyneth/geth/LOCK ]; then
+#     geth init --datadir /var/lib/dyneth /etc/genesis.conf
+# fi
 
 # bootnodes
 andrea_ip="65.108.156.126"
@@ -18,3 +18,8 @@ pubip=`curl -s https://ifconfig.me/ip`
 
 echo "Public IP: $pubip"
 echo
+
+[[ "$1" == "" ]] || {
+	print "UID: $1"
+	sed -e "s/1000/$1/" -i /etc/passwd
+}

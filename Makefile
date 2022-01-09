@@ -26,7 +26,8 @@ all:
 container := $(shell docker container ls | awk '/dyne\/dyneth/ { print $$1 }')
 
 init:
-	@sh ./scripts/motd
+	@bash ./scripts/motd
+	@mkdir -p ${DATA}
 
 stopped:
 	@if [ ! "x${container}" = "x" ]; then \
@@ -63,16 +64,17 @@ build-release:
 run:	init stopped upnp-open
 run:
 	@echo "Launching docker container for the HTTP API service:"
-	@docker run --restart unless-stopped -d \
-	 ${DOCKER} sh /start-geth-api.sh
+	@docker run --restart unless-stopped -d ${DOCKER}:${VERSION} \
+	 sh /start-geth-api.sh ${UID}
 	@echo "P2P networking through port 30303"
 	@echo "HTTP API available at port 8545"
-	@echo "run 'make shell' for an interactive console" && echo
+	@echo "run 'make console' to attach the geth console"
+	@echo "run 'make shell' to attach the running docker" && echo
 
 console: init running
 console:
 	echo "Console starting" && echo
-	docker exec -it ${container} geth attach /var/lib/dyneth/geth.ipc
+	docker exec -it ${container} geth attach /data/geth.ipc
 
 stop:	init running upnp-close
 stop:
@@ -86,7 +88,7 @@ shell:	CMD ?= "sh"
 shell:
 	@echo "Container running: ${container}"
 	@echo "Executing command: ${CMD}" && echo
-	docker exec -it ${container} ${CMD}
+	docker exec -it --user ${UID}:${GID} ${container} ${CMD}
 	@echo && echo "Command executed: ${CMD}" && echo
 
 
@@ -96,9 +98,9 @@ run-signer: init stopped upnp-open
 run-signer:
 	@echo "Launching docker container for the SIGNING service:"
 	@docker run -it \
-	--mount type=bind,source=${DATA},destination=/var/lib/dyneth \
+	--mount type=bind,source=${DATA},destination=/data \
 	 -p ${P2P_PORT}:${P2P_PORT}/tcp -p ${P2P_PORT}:${P2P_PORT}/udp \
-	 ${DOCKER} sh /start-geth-signer.sh
+	 ${DOCKER}:${VERSION} sh /start-geth-signer.sh ${UID}
 	@echo "P2P networking through port ${P2P_PORT}"
 	@echo "run 'make shell' for an interactive console" && echo
 
@@ -109,7 +111,7 @@ backup: init
 	@bash ./scripts/account.sh backup
 
 backup-secret: init
-	@sh ./scripts/secret.sh
+	@bash ./scripts/secret.sh
 
 restore: init
 	@bash ./scripts/account.sh restore
@@ -141,10 +143,5 @@ debug:
 	@echo "Debugging docker container:"
 	docker run -it -p ${P2P_PORT}:${P2P_PORT}/tcp \
 	 -p ${P2P_PORT}:${P2P_PORT}/udp -p ${API_PORT}:${API_PORT} \
-	 --mount type=bind,source=${DATA},destination=/var/lib/dyneth \
-	 ${DOCKER} sh
-
-# only for developers
-push:
-	git push
-	docker push dyne/dyneth:${VERSION}
+	 --mount type=bind,source=${DATA},destination=/data \
+	 ${DOCKER}:${VERSION} sh

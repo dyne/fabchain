@@ -2,10 +2,10 @@
 # requires sh
 
 # opens a shell in a running dyneth docker
-R=${HOME}/.dyneth
-umask 077
-mkdir -p ${R}/log
-touch ${R}/.keep || exit 1
+. scripts/host-lib.sh
+
+mkdir -p ${DATA}/log
+touch ${DATA}/.keep || exit 1
 
 cat >&2 <<EOF
 
@@ -16,7 +16,7 @@ cat >&2 <<EOF
 EOF
 
 found=0
-if [ -d ${R}/keystore ]; then
+if [ -d ${DATA}/keystore ]; then
     acctpath=`find ${R}/keystore/ -type f`
     if [ ! "$acctpath" = "" ]; then
 	found=1
