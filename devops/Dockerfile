@@ -18,8 +18,9 @@ RUN go get -d github.com/ethereum/go-ethereum@v$GETH_VERSION \
 
 RUN git clone https://github.com/ethereum/solidity \
     && cd solidity && git checkout tags/v${SOLC_VERSION} \
-    && mkdir build && cd build && cmake .. && make solc && make install -C solc
-RUN strip /usr/local/bin/solc
+    && touch prerelease.txt && mkdir build && cd build \
+    && cmake .. -DCMAKE_BUILD_TYPE=Release -DTESTS=0 -DSTATIC_LINKING=1 \
+    && make solc && make install -C solc && strip /usr/local/bin/solc
 
 FROM alpine:latest
 
