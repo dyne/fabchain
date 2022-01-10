@@ -1,8 +1,3 @@
-#!/bin/sh
-
-# if [ ! -r /var/lib/dyneth/geth/LOCK ]; then
-#     geth init --datadir /var/lib/dyneth /etc/genesis.conf
-# fi
 
 # bootnodes
 andrea_ip="65.108.156.126"

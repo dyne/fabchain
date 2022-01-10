@@ -1,8 +1,10 @@
 #!/bin/sh
 
+data=/home/geth/.ethereum
+
 found=0
-if [ -r /var/lib/dyneth/keystore ]; then
-    kpath=`find /var/lib/dyneth/keystore -type f`
+if [ -r ${data}/keystore ]; then
+    kpath=`find ${data}/keystore -type f`
     if [ ! "x$kpath" = "x" ]; then
 	if [ -r "$kpath" ]; then
 	    found=1
@@ -10,7 +12,7 @@ if [ -r /var/lib/dyneth/keystore ]; then
     fi
 fi
 if [ $found = 0 ]; then
-    echo "Signer keys not found in /var/lib/dyneth/keystore"
+    echo "Signer keys not found in ${data}/keystore"
     exit 1
 fi
 
@@ -21,7 +23,6 @@ echo
 . /init-geth.sh $1
 
 geth --networkid ${CONF_NETWORK_ID} \
-     --datadir /var/lib/dyneth \
      --ipcpath geth.ipc \
      --nat extip:${pubip} \
      --port ${CONF_P2P_PORT} --nodiscover \

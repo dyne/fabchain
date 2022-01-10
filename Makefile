@@ -74,7 +74,7 @@ run:
 console: init running
 console:
 	echo "Console starting" && echo
-	docker exec -it ${container} geth attach /data/geth.ipc
+	docker exec -it --user geth ${container} geth attach
 
 stop:	init running upnp-close
 stop:
@@ -84,11 +84,11 @@ stop:
 	 sh ./scripts/upnp.sh close ${P2P_PORT} udp
 
 shell:	init running
-shell:	CMD ?= "sh"
+shell:	CMD ?= "bash"
 shell:
 	@echo "Container running: ${container}"
 	@echo "Executing command: ${CMD}" && echo
-	docker exec -it --user ${UID}:${GID} ${container} ${CMD}
+	docker exec -it --user geth ${container} ${CMD}
 	@echo && echo "Command executed: ${CMD}" && echo
 
 
@@ -144,4 +144,4 @@ debug:
 	docker run -it -p ${P2P_PORT}:${P2P_PORT}/tcp \
 	 -p ${P2P_PORT}:${P2P_PORT}/udp -p ${API_PORT}:${API_PORT} \
 	 --mount type=bind,source=${DATA},destination=/data \
-	 ${DOCKER}:${VERSION} sh
+	 ${DOCKER}:${VERSION} bash
