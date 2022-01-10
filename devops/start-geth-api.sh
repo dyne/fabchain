@@ -2,8 +2,7 @@
 
 . /init-geth.sh $1
 
-setuidgid geth geth --networkid $CONF_NETWORK_ID \
-     --datadir /home/geth/.ethereum \
+geth --networkid $CONF_NETWORK_ID \
      --ipcpath geth.ipc \
      --port $CONF_P2P_PORT --nodiscover \
      --nat extip:${pubip} \
