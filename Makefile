@@ -98,7 +98,7 @@ run-signer: init stopped upnp-open
 run-signer:
 	@echo "Launching docker container for the SIGNING service:"
 	@docker run -it \
-	--mount type=bind,source=${DATA},destination=/data \
+	--mount type=bind,source=${DATA},destination=/home/geth/.ethereum \
 	 -p ${P2P_PORT}:${P2P_PORT}/tcp -p ${P2P_PORT}:${P2P_PORT}/udp \
 	 ${DOCKER}:${VERSION} sh /start-geth-signer.sh ${UID}
 	@echo "P2P networking through port ${P2P_PORT}"
@@ -141,7 +141,7 @@ debug:
 	@echo "HTTP API available at port ${API_PORT}"
 	@echo "Data storage in ~/.dyneth" && echo
 	@echo "Debugging docker container:"
-	docker run -it -p ${P2P_PORT}:${P2P_PORT}/tcp \
+	docker run -it --user root -p ${P2P_PORT}:${P2P_PORT}/tcp \
 	 -p ${P2P_PORT}:${P2P_PORT}/udp -p ${API_PORT}:${API_PORT} \
-	 --mount type=bind,source=${DATA},destination=/data \
+	 --mount type=bind,source=${DATA},destination=/home/geth/.ethereum \
 	 ${DOCKER}:${VERSION} bash
