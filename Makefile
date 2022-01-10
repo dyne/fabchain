@@ -64,10 +64,10 @@ build-release:
 run:	init stopped upnp-open
 run:
 	@echo "Launching docker container for the HTTP API service:"
-	@docker run --restart unless-stopped -d ${DOCKER}:${VERSION} \
-	 sh /start-geth-api.sh ${UID}
+	@docker  run -p ${API_PORT}:${API_PORT} --restart unless-stopped -d ${DOCKER}:${VERSION} \
+	  sh /start-geth-api.sh ${UID}
 	@echo "P2P networking through port 30303"
-	@echo "HTTP API available at port 8545"
+	@echo "HTTP API available at port ${API_PORT}"
 	@echo "run 'make console' to attach the geth console"
 	@echo "run 'make shell' to attach the running docker" && echo
 
