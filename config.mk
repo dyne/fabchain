@@ -6,6 +6,7 @@ NETWORK_ID := 1146703429
 P2P_PORT := 30303
 API_PORT := 8545
 DATA := $(shell pwd)/data
+CONTRACTS := $(shell pwd)/contracts
 
 # automatic
 UID = $(id -u)

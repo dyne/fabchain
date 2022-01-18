@@ -64,7 +64,7 @@ build-release:
 run:	init stopped upnp-open
 run:
 	@echo "Launching docker container for the HTTP API service:"
-	@docker  run -p ${API_PORT}:${API_PORT} --restart unless-stopped -d ${DOCKER}:${VERSION} \
+	@docker  run --restart unless-stopped -d --mount "type=bind,source=${CONTRACTS},destination=/contracts" -p ${API_PORT}:${API_PORT} ${DOCKER}:${VERSION} \
 	  sh /start-geth-api.sh ${UID}
 	@echo "P2P networking through port 30303"
 	@echo "HTTP API available at port ${API_PORT}"
@@ -91,6 +91,8 @@ shell:
 	docker exec -it --user geth ${container} ${CMD}
 	@echo && echo "Command executed: ${CMD}" && echo
 
+deploy: init running
+	@bash ./scripts/deploy.sh @
 
 # SIGNER
 
@@ -144,4 +146,5 @@ debug:
 	docker run -it --user root -p ${P2P_PORT}:${P2P_PORT}/tcp \
 	 -p ${P2P_PORT}:${P2P_PORT}/udp -p ${API_PORT}:${API_PORT} \
 	 --mount type=bind,source=${DATA},destination=/home/geth/.ethereum \
+	 --mount "type=bind,source=${CONTRACTS},destination=/contracts" \
 	 ${DOCKER}:${VERSION} bash
