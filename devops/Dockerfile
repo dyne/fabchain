@@ -57,7 +57,8 @@ EXPOSE $CONF_API_PORT $CONF_P2P_PORT $CONF_P2P_PORT/udp
 RUN mkdir -p /var/mail && useradd -m geth --uid=1000 \
     && echo "geth:geth" | chpasswd \
     && mkdir -p /home/geth/.ethereum \
-    && chown -R 1000:1000 /home/geth/.ethereum
+    && chown -R 1000:1000 /home/geth/.ethereum \
+    && mkdir /contracts
 
 USER geth
 WORKDIR /home/geth
