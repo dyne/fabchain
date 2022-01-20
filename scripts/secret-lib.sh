@@ -3,7 +3,8 @@
 . scripts/host-lib.sh
 
 sk=''
-# In the output, the last line is the secret key
+# On stdin/stdout there is the input/output with the user
+# the secret key will be put in the global variable sk
 secret_key() {
   keystore=`find ${R}/keystore/ -type f`
 

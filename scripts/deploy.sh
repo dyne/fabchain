@@ -1,10 +1,11 @@
 . scripts/secret-lib.sh
 
+# TODO: ask for the name of the contract on stdin
 contract="Storage"
+# run solc in the container, the solidity script is in the shared
+# directory "contracts"
 docker exec -it ${container} sh -c "cd /contracts && solc --overwrite --bin --abi \"${contract}.sol\" -o build"
 
-# ask for the password and save the secret key
-#sk=$(echo $(secret_key | tee /dev/tty) | tail -n 1 | awk '{print $NF}')
 secret_key
 res=$?
 if [ ! $res = 0 ]; then
