@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - 'main'
-    tags:
-      - 'v*'
+#    tags:
+#      - 'v*'
   pull_request:
     branches:
       - 'main'
@@ -50,12 +50,17 @@ jobs:
       - name: Parse config
         id: conf
         run: |
-          args=$(cat config.mk | awk -F" := " '!/^#/ && length($1) > 0 {print $1"="$2}')
+          args=$(cat config.mk | awk -F " := " '!/^#/ && length($1) > 0 {print $1"="$2}')
           args="${args//'%'/'%25'}"
           args="${args//$'\n'/'%0A'}"
           args="${args//$'\r'/'%0D'}"
           echo $args
           echo ::set-output name=buildargs::$args
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
       - name: Build and push Docker image 
         uses: docker/build-push-action@v2
@@ -64,5 +69,6 @@ jobs:
           context: ./devops/
           build-args: ${{ steps.conf.outputs.buildargs }}
           push: true
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
