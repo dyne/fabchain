@@ -1,0 +1,66 @@
+name: Build and publish an ARM64 Docker image
+
+on: [push]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=tag
+            type=match,pattern=\d.\d
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+          labels: |
+            org.opencontainers.image.authors=Denis Roio <jaromil@dyne.org>, Puria Nafisi Azizi <puria@dyne.org>
+            org.opencontainers.image.vendor=Dyne.org
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v1
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Parse config
+        id: conf
+        run: |
+          args=$(cat config.mk | awk -F " := " '!/^#/ && length($1) > 0 {print $1"="$2}')
+          args="${args//'%'/'%25'}"
+          args="${args//$'\n'/'%0A'}"
+          args="${args//$'\r'/'%0D'}"
+          echo $args
+          echo ::set-output name=buildargs::$args
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and push Docker image 
+        uses: docker/build-push-action@v2
+        if: github.event_name != 'pull_request'
+        with:
+          context: ./devops/
+          build-args: ${{ steps.conf.outputs.buildargs }}
+          push: true
+          platforms: linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}-arm64
+          labels: ${{ steps.meta.outputs.labels }}

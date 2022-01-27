@@ -1,14 +1,6 @@
-name: Create and publish a Docker image
+name: Create and publish an AMD64 Docker image
 
-on:
-  push:
-    branches:
-      - 'main'
-    tags:
-      - 'v*'
-  pull_request:
-    branches:
-      - 'main'
+on: [push]
 
 env:
   REGISTRY: ghcr.io
@@ -50,12 +42,17 @@ jobs:
       - name: Parse config
         id: conf
         run: |
-          args=$(cat config.mk | awk -F" := " '!/^#/ && length($1) > 0 {print $1"="$2}')
+          args=$(cat config.mk | awk -F " := " '!/^#/ && length($1) > 0 {print $1"="$2}')
           args="${args//'%'/'%25'}"
           args="${args//$'\n'/'%0A'}"
           args="${args//$'\r'/'%0D'}"
           echo $args
           echo ::set-output name=buildargs::$args
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
       - name: Build and push Docker image 
         uses: docker/build-push-action@v2
@@ -64,5 +61,6 @@ jobs:
           context: ./devops/
           build-args: ${{ steps.conf.outputs.buildargs }}
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          platforms: linux/amd64
+          tags: ${{ steps.meta.outputs.tags }}-x86
           labels: ${{ steps.meta.outputs.labels }}
