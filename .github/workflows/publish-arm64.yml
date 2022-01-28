@@ -1,4 +1,4 @@
-name: Create and publish an AMD64 Docker image
+name: Build and publish an ARM64 Docker image
 
 on: [push]
 
@@ -61,6 +61,6 @@ jobs:
           context: ./devops/
           build-args: ${{ steps.conf.outputs.buildargs }}
           push: true
-          platforms: linux/amd64
-          tags: ${{ steps.meta.outputs.tags }}
+          platforms: linux/arm64
+          tags: 'experimental'
           labels: ${{ steps.meta.outputs.labels }}
