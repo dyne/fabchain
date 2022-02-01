@@ -92,8 +92,10 @@ shell:
 	@echo && echo "Command executed: ${CMD}" && echo
 
 deploy: init running
-	@bash ./scripts/deploy.sh @
+	@bash ./scripts/deploy.sh
 
+receipt: init
+	@bash ./scripts/receipt.sh
 # SIGNER
 
 run-signer: init stopped upnp-open

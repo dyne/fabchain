@@ -1,3 +1,5 @@
+# Deploy a contract given the solidity script on a network
+
 . scripts/secret-lib.sh
 
 # TODO: ask for the name of the contract on stdin
@@ -44,7 +46,11 @@ construct_txn = my_contract.constructor().buildTransaction({
 
 signed = account.signTransaction(construct_txn)
 
-print(w3.eth.sendRawTransaction(signed.rawTransaction).hex())
+txid=w3.eth.sendRawTransaction(signed.rawTransaction).hex()
+
+print("Transaction id: {}".format(txid))
+
+print(w3.eth.getTransactionReceipt(txid))
 
 EOF
 
