@@ -49,6 +49,13 @@ jobs:
           echo $args
           echo ::set-output name=buildargs::$args
 
+      - name: Tag version
+        id: version
+        run: |
+          args=$(cat config.mk | awk -F " := " '/^VERSION/ {print $2}')
+	  echo "Tagging version: $args"
+          echo ::set-output name=tag::$args
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -62,5 +69,5 @@ jobs:
           build-args: ${{ steps.conf.outputs.buildargs }}
           push: true
           platforms: linux/amd64
-          tags: $(cat config.mk | awk -F " := " '/^VERSION/ {print $2}')
+          tags: ${{ steps.version.outputs.tag }}
           labels: ${{ steps.meta.outputs.labels }}
