@@ -3,10 +3,10 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 /**
- * @title Storage
+ * @title IntKey
  * @dev Store & retrieve value in a variable
  */
-contract Storage {
+contract IntKey {
 
     uint256 number;
 
