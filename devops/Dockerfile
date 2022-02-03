@@ -20,7 +20,11 @@ RUN git clone https://github.com/ethereum/solidity \
     && cd solidity && git checkout tags/v${SOLC_VERSION} \
     && touch prerelease.txt && mkdir build && cd build \
     && cmake .. -DCMAKE_BUILD_TYPE=Release -DTESTS=0 -DSTATIC_LINKING=1 \
-    && make solc && make install -C solc && strip /usr/local/bin/solc
+    && make solc -j4 && make install -C solc && strip /usr/local/bin/solc
+
+## python3 web3
+RUN apk add --no-cache py3-pip gcc python3-dev musl-dev linux-headers \
+    && pip install web3
 
 FROM alpine:latest
 
@@ -36,6 +40,8 @@ COPY genesis.conf /etc/dyneth/genesis.conf
 COPY init-geth.sh /
 COPY start-geth-api.sh /
 COPY start-geth-signer.sh /
+COPY --from=builder /usr/bin/python* /usr/bin/
+COPY --from=builder /usr/lib/python* /usr/lib/
 
 ARG VERSION
 ENV VERSION $VERSION
