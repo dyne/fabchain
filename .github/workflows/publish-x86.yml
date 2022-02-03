@@ -53,7 +53,7 @@ jobs:
         id: version
         run: |
           args=$(cat config.mk | awk -F " := " '/^VERSION/ {print $2}')
-	  echo "Tagging version: $args"
+          echo "Tagging version: $args"
           echo ::set-output name=tag::$args
 
       - name: Set up QEMU
