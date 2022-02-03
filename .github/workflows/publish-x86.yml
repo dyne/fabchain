@@ -62,5 +62,5 @@ jobs:
           build-args: ${{ steps.conf.outputs.buildargs }}
           push: true
           platforms: linux/amd64
-          tags: ${{ steps.meta.outputs.tags }}-x86
+          tags: $(cat config.mk | awk -F " := " '/^VERSION/ {print $2}')
           labels: ${{ steps.meta.outputs.labels }}
