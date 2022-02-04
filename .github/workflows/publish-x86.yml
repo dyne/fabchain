@@ -1,4 +1,4 @@
-name: Create and publish an AMD64 Docker image
+name: Docker AMD64
 
 on:
   push:
