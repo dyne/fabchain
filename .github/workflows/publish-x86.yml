@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - devops/**
+      - .github/workflows/*
 
 env:
   REGISTRY: ghcr.io
@@ -24,7 +25,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: dyne/${{ env.IMAGE_NAME }}
+          images: ${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=tag
             type=match,pattern=\d.\d
