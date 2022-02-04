@@ -52,7 +52,7 @@ jobs:
       - name: Tag version
         id: version
         run: |
-          args=$(cat config.mk | awk -F " := " '/^VERSION/ {print $2}')
+          args=$(find devops -type f -print0 | sort -z | xargs -0 sha1sum | sha1sum | awk '{print $1}')
           echo "Tagging version: $args"
           echo ::set-output name=tag::$args
 
