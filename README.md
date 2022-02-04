@@ -4,8 +4,16 @@
 ░▀▀░░░▀░░▀░▀░▀▀▀░░▀░░▀░▀
 ```
 
+<p align="center">
+  <a href="https://hub.docker.com/r/dyne/dyneth/">
+    <img src="https://github.com/dyne/dyneth/actions/workflows/publish-x86.yml/badge.svg" alt="Docker build Status" />
+  </a>
+  <a href="https://dyne.org">
+    <img src="https://img.shields.io/badge/%3C%2F%3E%20with%20%E2%9D%A4%20by-Dyne.org-blue.svg" alt="Dyne.org" />
+  </a>
+</p>
+
 <a href="https://dyne.org">
-	<img src="https://img.shields.io/badge/%3C%2F%3E%20with%20%E2%9D%A4%20by-Dyne.org-blue.svg" alt="Dyne.org">
 </a>
 
 <h4 align="center">
