@@ -6,9 +6,9 @@ found=0
 if [ -r ${data}/keystore ]; then
     kpath=`find ${data}/keystore -type f`
     if [ ! "x$kpath" = "x" ]; then
-	if [ -r "$kpath" ]; then
-	    found=1
-	fi
+      if [ -r "$kpath" ]; then
+          found=1
+      fi
     fi
 fi
 if [ $found = 0 ]; then
