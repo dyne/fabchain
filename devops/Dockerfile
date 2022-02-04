@@ -22,14 +22,12 @@ RUN git clone https://github.com/ethereum/solidity \
     && cmake .. -DCMAKE_BUILD_TYPE=Release -DTESTS=0 -DSTATIC_LINKING=1 \
     && make solc -j4 && make install -C solc && strip /usr/local/bin/solc
 
-## python3 web3
-RUN apk add --no-cache py3-pip gcc python3-dev musl-dev linux-headers \
-    && pip install web3
-
 FROM alpine:latest
 
 # echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
-RUN apk add --no-cache ca-certificates curl mawk shadow bash libgcc libstdc++
+RUN apk add --no-cache ca-certificates curl mawk shadow bash libgcc libstdc++ \
+    py3-pip gcc python3-dev musl-dev linux-headers ## python3 web3
+RUN pip install web3 && pip cache purge
 
 RUN curl -so /usr/local/bin/zenroom \
     https://files.dyne.org/zenroom/nightly/zenroom-linux-amd64 \
@@ -40,9 +38,6 @@ COPY genesis.conf /etc/dyneth/genesis.conf
 COPY init-geth.sh /
 COPY start-geth-api.sh /
 COPY start-geth-signer.sh /
-COPY --from=builder /usr/bin/python* /usr/bin/
-COPY --from=builder /usr/lib/python* /usr/lib/
-
 ARG VERSION
 ENV VERSION $VERSION
 ARG NETWORK_ID
