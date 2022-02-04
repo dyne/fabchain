@@ -1,6 +1,9 @@
 name: Create and publish an AMD64 Docker image
 
-on: [push]
+on:
+  push:
+    paths:
+      - devops/**
 
 env:
   REGISTRY: ghcr.io
