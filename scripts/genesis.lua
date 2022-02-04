@@ -22,13 +22,13 @@
 -- Usage: zenroom genesis.lua -A <(`date +"%s"`)
 
 -- numerical ID of the chain
-chainid = 1146703429
+chainid = 6709602
 
 -- initial amount given to signers
 share = 1048576
 
 -- estimated using https://etherscan.io/chart/gaslimit
-gaslimit = 30000000
+gaslimit = 31000000
 
 -- list of public addresses of signers and shareholders
 signers = { 'D77136c62F8d62793eaA6a5B26581630AEB4fe2F', -- j
