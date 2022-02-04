@@ -73,5 +73,5 @@ jobs:
           build-args: ${{ steps.conf.outputs.buildargs }}
           push: true
           platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/$${{ env.IMAGE_NAME }}:${{ steps.version.outputs.tag }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.tag }}
           labels: ${{ steps.meta.outputs.labels }}
