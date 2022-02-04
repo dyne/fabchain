@@ -1,0 +1,20 @@
+---
+- name: node configuration
+  hosts: fabchain
+  tasks:
+  - name: install docker
+    shell: cd ~ && curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh
+
+  - name: install zenroom
+    shell: >
+      curl -o /usr/local/bin/zenroom \
+      https://files.dyne.org/zenroom/nightly/zenroom-linux-amd64 \
+      && chmod +x /usr/local/bin/zenroom
+
+  - name: install git, make, upnpc
+    with_items: git, make, miniupnpc
+    action: "{{ ansible_pkg_mgr }} state=present name={{ item }}"
+
+  - name: rebot in the end
+    reboot:
+
