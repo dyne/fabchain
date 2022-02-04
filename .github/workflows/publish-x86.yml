@@ -39,7 +39,7 @@ jobs:
         uses: docker/login-action@v1
         if: github.event_name != 'pull_request'
         with:
-          username: ${{ github.actor }}
+          username: dyne
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Log in to the Container registry
