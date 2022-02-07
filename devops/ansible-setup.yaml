@@ -2,8 +2,15 @@
 - name: node configuration
   hosts: fabchain
   tasks:
+  - name: Update and upgrade apt packages
+    become: true
+    apt:
+      upgrade: yes
+      update_cache: yes
+      cache_valid_time: 86400 #One day
+
   - name: install git, make, upnpc, curl
-    with_items: git, make, miniupnpc, curl
+    with_items: make, miniupnpc, curl, git
     action: "{{ ansible_pkg_mgr }} state=present name={{ item }}"
 
   - name: install docker
@@ -21,7 +28,7 @@
   - name: Create a login user
     user:
       name: "utente"
-      password: "$6$8IAGh7Gu2ugAB.sF$zHldDAEBMoiFUPq2RsGpQ.TRwbPOz3/S5ATs5TbfWDLypYjLGfKN8SNxu1Sx5nNfzQgDJqBh37jT9ln7EIHcq0"
+      password: "$6$DFKC79U0KWiERbCJ$n04KiRFRjvsObqlzKOZNYJlBIBpt2U9wfCuBJgNxydzdJQIRwqFE0oW.UdtST65.q/zZ6QRosKMQZAFE2RE270"
       groups:
         - docker
       state: present
