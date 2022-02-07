@@ -4,6 +4,10 @@ include config.mk
 
 export
 
+##@ General
+help: ## Display this help.
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' Makefile
+
 all:
 	@echo "Dyneth ${VERSION}" && echo
 	@echo "Server commands:" ;\
@@ -37,32 +41,10 @@ running:
 	@if [ "x${container}" = "x" ]; then \
 		echo "Container is not running"; echo; exit 1; fi
 
-upnp-open: upnpc=$(shell which upnpc)
-upnp-open:
-	@if [ "x${upnpc}" = "x" ]; then \
-	 echo "UPNP client not found, unable to open P2P port forwarding" ;\
-	else \
-	 sh ./scripts/upnp.sh open ${P2P_PORT} tcp ;\
-	 sh ./scripts/upnp.sh open ${P2P_PORT} udp ;\
-	fi
-
-upnp-close: upnpc=$(shell which upnpc)
-upnp-close:
-	@if [ "x${upnpc}" = "x" ]; then \
-	 echo "UPNP client not found, unable to close P2P port forwarding" ;\
-	else \
-	 sh ./scripts/upnp.sh close ${P2P_PORT} tcp ;\
-	 sh ./scripts/upnp.sh close ${P2P_PORT} udp ;\
-	fi
-
-build:
-	make -C devops
-
-build-release:
-	make -C devops
+##@ Server commands
 
 run:	init stopped upnp-open
-run:
+run: ## start the API node listening on HTTP port
 	@echo "Launching docker container for the HTTP API service:"
 	@docker  run --restart unless-stopped -d --mount "type=bind,source=${CONTRACTS},destination=/contracts" -p ${API_PORT}:${API_PORT} ${DOCKER}:${VERSION} \
 	  sh /start-geth-api.sh ${UID}
@@ -71,35 +53,8 @@ run:
 	@echo "run 'make console' to attach the geth console"
 	@echo "run 'make shell' to attach the running docker" && echo
 
-console: init running
-console:
-	echo "Console starting" && echo
-	docker exec -it --user geth ${container} geth attach
-
-stop:	init running upnp-close
-stop:
-	@echo "Stopping container: ${container}"
-	@docker container stop ${container}
-	@sh ./scripts/upnp.sh close ${P2P_PORT} tcp ;\
-	 sh ./scripts/upnp.sh close ${P2P_PORT} udp
-
-shell:	init running
-shell:	CMD ?= "bash"
-shell:
-	@echo "Container running: ${container}"
-	@echo "Executing command: ${CMD}" && echo
-	docker exec -it --user geth ${container} ${CMD}
-	@echo && echo "Command executed: ${CMD}" && echo
-
-deploy: init running
-	@bash ./scripts/deploy.sh
-
-receipt: init
-	@bash ./scripts/receipt.sh
-# SIGNER
-
 run-signer: init stopped upnp-open
-run-signer:
+run-signer: ## start the SIGNER node networking on the P2P port
 	@echo "Launching docker container for the SIGNING service:"
 	@docker run -it \
 	--mount type=bind,source=${DATA},destination=/home/geth/.ethereum \
@@ -108,39 +63,94 @@ run-signer:
 	@echo "P2P networking through port ${P2P_PORT}"
 	@echo "run 'make shell' for an interactive console" && echo
 
-account: init
-	@bash ./scripts/account.sh new
-
-backup: init
-	@bash ./scripts/account.sh backup
-
-backup-secret: init
-	@bash ./scripts/secret.sh
-
-restore: init
-	@bash ./scripts/account.sh restore
-
 status: init
-status:
+status: ## see if server is running and print public address
 	@if [ "x${container}" = "x" ]; then \
 		echo "Status: NOT RUNNING" && echo ;\
 	else \
 		echo "Status: RUNNING" && echo ;\
 	fi
 
-# GENESIS
-# operate just once
-genesis: epoch := $(shell date +"%s")
-genesis: tmp := $(shell mktemp)
-genesis:
-	@echo -n ${epoch} > ${tmp}
-	@zenroom scripts/genesis.lua -a ${tmp}
-	@rm -f tmp
+shell:	init running
+shell:	CMD ?= "bash"
+shell: ## open a shell inside running server (CMD=sh or custom)
+	@echo "Container running: ${container}"
+	@echo "Executing command: ${CMD}" && echo
+	docker exec -it --user geth ${container} ${CMD}
+	@echo && echo "Command executed: ${CMD}" && echo
 
-# DEBUG
+console: init running
+console: ## open the geth console inside running server
+	echo "Console starting" && echo
+	docker exec -it --user geth ${container} geth attach
+
+stop:	init running upnp-close
+stop: ## stop running server
+	@echo "Stopping container: ${container}"
+	@docker container stop ${container}
+	@sh ./scripts/upnp.sh close ${P2P_PORT} tcp ;\
+	 sh ./scripts/upnp.sh close ${P2P_PORT} udp
+
+##@ Network commands
+
+upnp-open: upnpc=$(shell which upnpc)
+upnp-open: ## open UPNP port-forwarding on LAN router
+	@if [ "x${upnpc}" = "x" ]; then \
+	 echo "UPNP client not found, unable to open P2P port forwarding" ;\
+	else \
+	 sh ./scripts/upnp.sh open ${P2P_PORT} tcp ;\
+	 sh ./scripts/upnp.sh open ${P2P_PORT} udp ;\
+	fi
+
+upnp-close: upnpc=$(shell which upnpc)
+upnp-close: ## close UPNP port-forwarding on LAN router
+	@if [ "x${upnpc}" = "x" ]; then \
+	 echo "UPNP client not found, unable to close P2P port forwarding" ;\
+	else \
+	 sh ./scripts/upnp.sh close ${P2P_PORT} tcp ;\
+	 sh ./scripts/upnp.sh close ${P2P_PORT} udp ;\
+	fi
+
+
+deploy: init running
+	@bash ./scripts/deploy.sh
+
+receipt: init
+	@bash ./scripts/receipt.sh
+
+##@ Account commands:
+account: init ## create a new private account in data/keystore
+	@bash ./scripts/account.sh new
+
+backup: init ## print the private account content as JSON string
+	@bash ./scripts/account.sh backup
+
+backup-secret: init ## print the wallet master secret key
+	@bash ./scripts/secret.sh
+
+restore: init ## ask for private account JSON to restore backup
+	@bash ./scripts/account.sh restore
+
+##@ Genesis commands
+genesis: epoch := $(shell date +"%s")
+genesis: genesis_tmp := $(shell mktemp)
+genesis: sh_tmp := $(shell mktemp)
+genesis: ## Create a new genesis
+	@bash ./scripts/ask_stakeholders.sh > ${sh_tmp}
+	@echo -n ${epoch} > ${genesis_tmp}
+	@zenroom scripts/genesis.lua -a ${genesis_tmp} -k ${sh_tmp}
+	@rm -f ${sh_tmp} ${genesis_tmp}
+
+##@ Development commands
+
+build: ## build the docker container
+	make -C devops
+
+build-release:
+	make -C devops
 
 debug:	init stopped
-debug:
+debug: ## run a shell in a new interactive container (no daemons)
 	@echo "P2P networking through port ${P2P_PORT}"
 	@echo "HTTP API available at port ${API_PORT}"
 	@echo "Data storage in ~/.dyneth" && echo
@@ -150,3 +160,4 @@ debug:
 	 --mount type=bind,source=${DATA},destination=/home/geth/.ethereum \
 	 --mount "type=bind,source=${CONTRACTS},destination=/contracts" \
 	 ${DOCKER}:${VERSION} bash
+
