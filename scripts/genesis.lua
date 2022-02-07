@@ -4,7 +4,7 @@
 --docs: https://geth.ethereum.org/docs/interface/private-network
 --requires Zenroom: https://zenroom.org
 --
---Copyright (C) 2021 Dyne.org foundation
+--Copyright (C) 2021-2022 Dyne.org foundation
 --designed, written and maintained by Denis Roio
 --
 --This program is free software: you can redistribute it and/or modify
@@ -31,10 +31,12 @@ share = 1048576
 gaslimit = 30000000
 
 -- list of public addresses of signers and shareholders
-signers = { 'D77136c62F8d62793eaA6a5B26581630AEB4fe2F', -- j
-	    '500932db2aaf42b42911b3ddcc80ae25bde94b80', -- a
-	    'CA5455Fdd04A47a3F2480570c7794945D7E18B6A'  -- p
-	  }
+signers = JSON.decode(KEYS)
+-- i.e:
+-- { 'D77136c62F8d62793eaA6a5B26581630AEB4fe2F', -- j
+--   '500932db2aaf42b42911b3ddcc80ae25bde94b80', -- a
+--   'CA5455Fdd04A47a3F2480570c7794945D7E18B6A'  -- p
+-- 	  }
 
 -- clique seconds of threshold for confirmations
 period = 7
