@@ -120,7 +120,13 @@ receipt: init
 
 ##@ Account commands:
 account: init ## create a new private account in data/keystore
-	@bash ./scripts/account.sh new
+	@if [ "x${PASS}" = "x" ]; then \
+	  echo "PASS is not defined" ;\
+	else \
+	  echo "${PASS}" | tee "${DATA}/passfile" >/dev/null ;\
+	  bash ./scripts/account.sh new ;\
+	  rm -rf "${DATA}/passfile" ;\
+	fi
 
 backup: init ## print the private account content as JSON string
 	@bash ./scripts/account.sh backup
