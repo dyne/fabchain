@@ -15,11 +15,6 @@ read params
 docker exec -it ${container} sh -c "cd /contracts && solc --overwrite --bin --abi \"${contract}.sol\" -o build"
 
 secret_key
-res=$?
-if [ ! $res = 0 ]; then
-    echo && echo "Error: wrong password?" && echo
-    exit 1
-fi
 
 tmp=`mktemp`
 cat <<EOF >$tmp
@@ -28,10 +23,10 @@ from web3 import Web3, HTTPProvider
 abi = None
 bin = None
 
-with open('contracts/build/$contract.abi') as file:
+with open('/contracts/build/$contract.abi') as file:
   abi = file.read()
 
-with open('contracts/build/$contract.bin') as file:
+with open('/contracts/build/$contract.bin') as file:
   bin = file.read()
 
 if not abi or not bin:
@@ -57,7 +52,7 @@ txid=w3.eth.sendRawTransaction(signed.rawTransaction).hex()
 print("Transaction id: {}".format(txid))
 EOF
 
-python $tmp
+cat $tmp | docker exec -i ${container} python3
 
 
 rm -rf $tmp

@@ -1,6 +1,7 @@
 ---
 - name: node configuration
   hosts: fabchain
+  remote_user: root
   tasks:
   - name: Update and upgrade apt packages
     become: true

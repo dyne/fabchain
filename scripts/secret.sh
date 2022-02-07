@@ -4,11 +4,6 @@
 . scripts/secret-lib.sh
 
 secret_key
-res=$?
-if [ ! $res = 0 ]; then
-    echo && echo "Error: wrong password?" && echo
-    exit 1
-fi
 echo && echo "Your secret key:"
 echo ${sk} && echo 
 

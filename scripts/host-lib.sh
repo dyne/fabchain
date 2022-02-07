@@ -30,6 +30,13 @@ function geth() {
 	   geth $*
 #	   --datadir /home/geth/.ethereum --keystore /home/geth/.ethereum/keystore
 }    
+function python() {
+    docker run -i \
+	   --mount type=bind,source=${R},destination=/home/geth/.ethereum \
+	   --mount type=bind,source=${CONTRACTS},destination=/contracts \
+	   ${D}:${V} \
+           python3 $*
+}
 function pk() {
     conf=${1:-`find ${R}/keystore/ -type f`}
     echo "print(JSON.decode(DATA).address)" | zenroom -a $conf 2> /dev/null
