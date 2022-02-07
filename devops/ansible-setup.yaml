@@ -17,4 +17,22 @@
 
   - name: reboot in the end
     reboot:
+  
+  - name: Create a login user
+    user:
+      name: "utente"
+      password: "$6$8IAGh7Gu2ugAB.sF$zHldDAEBMoiFUPq2RsGpQ.TRwbPOz3/S5ATs5TbfWDLypYjLGfKN8SNxu1Sx5nNfzQgDJqBh37jT9ln7EIHcq0"
+      groups:
+        - docker
+      state: present
+      shell: /bin/bash
+      uid: 1000
+      home: /home/utente
 
+  - name: log in as root and clone dyneth as utente
+    become: true
+    become_user: "utente"
+    shell: >
+      cd ~ \
+      && rm -rf dyneth \
+      && git clone https://github.com/dyne/dyneth.git
