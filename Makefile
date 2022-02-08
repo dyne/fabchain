@@ -122,6 +122,7 @@ receipt: init
 account: init ## create a new private account in data/keystore
 	@if [ "x${PASS}" = "x" ]; then \
 	  echo "PASS is not defined" ;\
+	  exit 1 ;\
 	else \
 	  echo "${PASS}" | tee "${DATA}/passfile" >/dev/null ;\
 	  bash ./scripts/account.sh new ;\

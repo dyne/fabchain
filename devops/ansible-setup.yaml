@@ -2,6 +2,8 @@
 - name: node configuration
   hosts: fabchain
   remote_user: root
+  vars:
+    geth_pass:     "{{ lookup('env','GETH_PASS') }}"
   tasks:
   - name: Update and upgrade apt packages
     become: true
@@ -14,14 +16,33 @@
     with_items: make, miniupnpc, curl, git
     action: "{{ ansible_pkg_mgr }} state=present name={{ item }}"
 
+  - name: check docker installed
+    shell: command -v docker>/dev/null && echo "DockerInstalled" || echo
+    register: docker_installed
+    changed_when: false
+
   - name: install docker
-    shell: cd ~ && curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh
+    shell: >
+      cd ~ && curl -fsSL https://get.docker.com -o get-docker.sh \
+      && sudo sh get-docker.sh
+    changed_when: docker_installed.stdout != "DockerInstalled"
+
+
+  - name: check zenroom installed
+    shell: command -v zenroom>/dev/null && echo "ZenroomInstalled" || echo
+    register: zenroom_installed
+    changed_when: false
 
   - name: install zenroom
     shell: >
       curl -o /usr/local/bin/zenroom \
       https://files.dyne.org/zenroom/nightly/zenroom-linux-amd64 \
-      && chmod +x /usr/local/bin/zenroom
+      && chmod +x /usr/local/bin/zenroom;
+    register: cmd_result
+    changed_when: zenroom_installed.stdout != "DockerInstalled"
+
+  - name: log geth address
+    debug: var=docker_installed.stdout
 
   - name: reboot in the end
     reboot:
@@ -43,4 +64,10 @@
     shell: >
       cd ~ \
       && rm -rf dyneth \
-      && git clone https://github.com/dyne/dyneth.git
+      && git clone https://github.com/dyne/dyneth.git \
+      && cd dyneth \
+      && make account PASS={{ geth_pass }}
+    register: geth_account_pass
+
+  - name: log geth address
+    debug: var=geth_account_pass.stdout
