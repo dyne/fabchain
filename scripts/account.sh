@@ -9,7 +9,7 @@ case "$1" in
          geth account new --password "/home/geth/.ethereum/passfile"
 	 conf=`find ${R}/keystore/ -type f`
 	 addr=`pk $conf`
-         mv $conf ${R}/keystore/$addr ;\
+         mv $conf ${R}/keystore/$addr
 	 ;;
 
     address) have

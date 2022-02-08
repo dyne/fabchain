@@ -3,7 +3,8 @@
   hosts: fabchain
   remote_user: root
   vars:
-    geth_pass:     "{{ lookup('env','GETH_PASS') }}"
+    geth_pass: "{{ lookup('env','GETH_PASS') }}"
+    ansible_remote_tmp: /tmp
   tasks:
   - name: Update and upgrade apt packages
     become: true
@@ -25,7 +26,7 @@
     shell: >
       cd ~ && curl -fsSL https://get.docker.com -o get-docker.sh \
       && sudo sh get-docker.sh
-    changed_when: docker_installed.stdout != "DockerInstalled"
+    when: docker_installed.stdout != "DockerInstalled"
 
 
   - name: check zenroom installed
@@ -39,12 +40,9 @@
       https://files.dyne.org/zenroom/nightly/zenroom-linux-amd64 \
       && chmod +x /usr/local/bin/zenroom;
     register: cmd_result
-    changed_when: zenroom_installed.stdout != "DockerInstalled"
+    when: zenroom_installed.stdout != "ZenroomInstalled"
 
-  - name: log geth address
-    debug: var=docker_installed.stdout
-
-  - name: reboot in the end
+  - name: reboot
     reboot:
   
   - name: Create a login user
@@ -61,7 +59,7 @@
   - name: log in as root and clone dyneth as utente
     become: true
     become_user: "utente"
-    shell: >
+    shell:
       cd ~ \
       && rm -rf dyneth \
       && git clone https://github.com/dyne/dyneth.git \
