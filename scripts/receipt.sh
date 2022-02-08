@@ -21,7 +21,7 @@ except Exception as e:
   print("Error: {}".format(e))
 EOF
 
-python $tmp
+cat $tmp | docker exec -i ${container} python3
 
 
 rm -rf $tmp
