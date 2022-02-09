@@ -1,9 +1,10 @@
 ---
-- name: node configuration
+- name: Dyneth node installation
   hosts: fabchain
   remote_user: root
   vars:
-    geth_pass: "{{ lookup('env','GETH_PASS') }}"
+    geth_pass: "{{ lookup('password','/tmp/passfile length=64 chars=ascii_letters,digits') }}"
+    dyneth_repo: "{{ lookup('env','DYNETH_REPO') or 'https://github.com/dyne/dyneth'}}"
     ansible_remote_tmp: /tmp
   tasks:
   - name: Update and upgrade apt packages
@@ -13,9 +14,16 @@
       update_cache: yes
       cache_valid_time: 86400 #One day
 
-  - name: install git, make, upnpc, curl
-    with_items: make, miniupnpc, curl, git
-    action: "{{ ansible_pkg_mgr }} state=present name={{ item }}"
+  - name: install package dependencies
+    ansible.builtin.package:
+      name:
+        - make
+        - miniupnpc
+        - curl
+        - git
+        - tree
+        - tmux
+      state: latest
 
   - name: check docker installed
     shell: command -v docker>/dev/null && echo "DockerInstalled" || echo
@@ -27,7 +35,6 @@
       cd ~ && curl -fsSL https://get.docker.com -o get-docker.sh \
       && sudo sh get-docker.sh
     when: docker_installed.stdout != "DockerInstalled"
-
 
   - name: check zenroom installed
     shell: command -v zenroom>/dev/null && echo "ZenroomInstalled" || echo
@@ -41,31 +48,32 @@
       && chmod +x /usr/local/bin/zenroom;
     register: cmd_result
     when: zenroom_installed.stdout != "ZenroomInstalled"
-
-  - name: reboot
-    reboot:
   
   - name: Create a login user
     user:
-      name: "utente"
-      password: "$6$DFKC79U0KWiERbCJ$n04KiRFRjvsObqlzKOZNYJlBIBpt2U9wfCuBJgNxydzdJQIRwqFE0oW.UdtST65.q/zZ6QRosKMQZAFE2RE270"
+      name: "app"
       groups:
         - docker
       state: present
       shell: /bin/bash
       uid: 1000
-      home: /home/utente
+      home: /home/app
 
-  - name: log in as root and clone dyneth as utente
+  - name: log in as root and clone dyneth as app
     become: true
-    become_user: "utente"
+    become_user: "app"
     shell:
       cd ~ \
       && rm -rf dyneth \
-      && git clone https://github.com/dyne/dyneth.git \
+      && git clone {{ dyneth_repo }} dyneth \
       && cd dyneth \
       && make account PASS={{ geth_pass }}
     register: geth_account_pass
+
+  - name: copy ssh keys from root to app
+    shell:
+      cp -ra ~/.ssh /home/app/ \
+      && chown -R app:app /home/app/.ssh
 
   - name: log geth address
     debug: var=geth_account_pass.stdout

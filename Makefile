@@ -3,8 +3,7 @@ HOME ?= $(shell pwd)
 include config.mk
 TAG := $(file <data/hash.tag)
 DOCKER_IMAGE := ${DOCKER}:${VERSION}-${TAG}
-NETWORK_ID:=$(if $(wildcard data/genesis.json),\
-$(shell awk '/"chainId":/{sub(/,/,"");print $$2}' data/genesis.json | sed 's/ //g'),1146703429)
+NETWORK_ID:=$(if $(wildcard data/genesis.json),$(shell awk '/"chainId":/{sub(/,/,"");print $$2}' data/genesis.json | sed 's/ //g'),1146703429)
 DATA := $(shell pwd)/data
 CONTRACTS := $(shell pwd)/contracts
 UID = $(id -u)
@@ -29,6 +28,8 @@ init:
 	$(file > ${DATA}/peerconf.sh,NETWORK_ID=${NETWORK_ID})
 	$(file >> ${DATA}/peerconf.sh,P2P_PORT=${P2P_PORT})
 	$(file >> ${DATA}/peerconf.sh,API_PORT=${API_PORT})
+	$(if $(wildcard data/genesis.conf),$(if $(wildcard devops/genesis.conf),\
+		$(shell diff data/genesis.conf devops/genesis.conf)))
 
 stopped:
 	$(if ${container},\
@@ -86,9 +87,9 @@ shell:	init running
 shell:	CMD ?= "bash"
 shell: ## open a shell inside running server (CMD=sh or custom)
 	$(info "Container running: ${container}")
-	$(info "Executing command: ${CMD}") && echo
+	$(info "Executing command: ${CMD}")
 	docker exec -it --user geth ${container} ${CMD}
-	&& $(info Command executed: ${CMD})
+	$(info Command executed: ${CMD})
 
 enr: running ## Obtain the ENR node record (admin.nodeInfo.enr)
 	$(if $(wildcard data/geth/chaindata/CURRENT),,\
@@ -162,6 +163,8 @@ genesis-create: ## Create data/genesis.json from parameters in scripts/params_ge
 genesis-init: ## Initialize node to use the new chain in data/genesis.json
 	$(if $(wildcard data/genesis.json),,\
 		$(error "Cannot find data/genesis.json, run 'make genesis-create' first"))
+	$(if $(wildcard data/geth/chaindata/CURRENT),\
+		$(error Genesis already initialized on node))
 	@docker run -it \
 	 --mount type=bind,source=${DATA},destination=/home/geth/.ethereum \
 	 ${DOCKER_IMAGE} geth init /home/geth/.ethereum/genesis.json
