@@ -140,20 +140,12 @@ restore: init ## ask for private account JSON to restore backup
 	@bash ./scripts/account.sh restore
 
 ##@ Genesis commands
-genesis-create: ## Create new genesis parameters in data/params_genesis.json
-	@if ! [ -r data/params_genesis.json ]; then \
-		bash ./scripts/input-genesis.sh ${NETWORK_ID} > data/params_genesis.json; fi
-	@echo
-	@echo "##############################"
-	@echo "EDIT data/params_genesis.json"
-	@echo "then RUN: make genesis-compile"
-	@echo "##############################"
-	@echo
-
-genesis-compile: ## Compile genesis parameters to data/genesis.json
-	@if ! [ -r data/params_genesis.json ]; then \
-		echo "run 'make genesis-create' first"; exit 1; fi
-	@zenroom scripts/genesis.lua -a data/params_genesis.json | jq . | tee data/genesis.json
+genesis-create: ## Create data/genesis.json from parameters in scripts/params_genesis.json
+	@if [ -r data/genesis.json ]; then \
+		echo "Cannot overwrite data/genesis.json"; exit 1; fi
+	@if ! [ -r scripts/params_genesis.json ]; then \
+		echo "Genesis parameters not found in scripts/params_genesis.json"; exit 1 ]; fi
+	@zenroom scripts/genesis.lua -a scripts/params_genesis.json | jq . | tee data/genesis.json
 	@echo
 	@echo "###########################"
 	@echo "now RUN: make genesis-init"
@@ -170,7 +162,8 @@ genesis-init: ## Initialize node to use the new chain in data/genesis.json
 ##@ Development commands
 
 tag: ## compute the version tag for current build
-	@find devops -type f -print0 | sort -z \
+	@mkdir -p data
+	@find container -type f -print0 | sort -z \
 	| xargs -0 sha1sum | sha1sum | awk '{print $$1}' \
 	| tee data/hash.tag
 
@@ -187,7 +180,7 @@ build: tag ## build the docker container
 	 --build-arg SOLC_VERSION=${SOLC_VERSION} \
 	 --build-arg VERSION=${VERSION} --build-arg NETWORK_ID=${NETWORK_ID} \
 	 --build-arg P2P_PORT=${P2P_PORT} --build-arg API_PORT=${API_PORT} \
-	 -f devops/Dockerfile devops
+	 -f container/Dockerfile container
 
 debug:	init stopped
 debug: ## run a shell in a new interactive container (no daemons)
