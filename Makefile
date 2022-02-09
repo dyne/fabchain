@@ -167,10 +167,10 @@ tag: ## compute the version tag for current build
 	| tee data/hash.tag
 
 pull: tag ## pull the image from docker-hub online repo
-	docker pull dyne/dyneth:$(file <data/hash.tag)
+	docker pull ${DOCKER_IMAGE}
 
 push: tag ## push the image to docker-hub online repo
-	docker push dyne/dyneth:$(file <data/hash.tag)
+	docker push ${DOCKER_IMAGE}
 
 build: tag ## build the docker container
 	docker build -t ${DOCKER_IMAGE} \
