@@ -15,4 +15,4 @@ geth --networkid ${NETWORK_ID} \
      --port ${P2P_PORT} \
      --syncmode "full" \
      --unlock $hexpk --mine \
-     ${password_arg} ${bootnodes_arg}
+     ${password_arg[@]} ${bootnodes_arg[@]}

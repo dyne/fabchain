@@ -11,4 +11,4 @@ geth --networkid $NETWORK_ID \
      --http --http.addr "0.0.0.0" \
      --http.port $API_PORT --http.vhosts '*' \
      --http.api web3,eth \
-       ${password_arg} ${bootnodes_arg}
+     ${password_arg[@]} ${bootnodes_arg[@]}

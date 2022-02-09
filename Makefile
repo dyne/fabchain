@@ -39,7 +39,7 @@ run: ## start the API node listening on HTTP port
 	--mount "type=bind,source=${CONTRACTS},destination=/contracts" \
 	--mount "type=bind,source=${DATA},destination=/home/geth/.ethereum" \
 	-p ${API_PORT}:${API_PORT} ${DOCKER_IMAGE} \
-	  sh /start-geth-api.sh ${UID} ${SYNCMODE}
+	  bash /start-geth-api.sh ${UID} ${SYNCMODE}
 	@echo "P2P networking through port 30303"
 	@echo "HTTP API available at port ${API_PORT}"
 	@echo "run 'make console' to attach the geth console"
@@ -51,7 +51,7 @@ run-signer: ## start the SIGNER node networking on the P2P port
 	@docker run --restart unless-stopped -d \
 	--mount "type=bind,source=${DATA},destination=/home/geth/.ethereum" \
 	 -p ${P2P_PORT}:${P2P_PORT}/tcp -p ${P2P_PORT}:${P2P_PORT}/udp \
-	 ${DOCKER_IMAGE} sh /start-geth-signer.sh ${UID}
+	 ${DOCKER_IMAGE} bash /start-geth-signer.sh ${UID}
 	@echo "P2P networking through port ${P2P_PORT}"
 	@echo "run 'make shell' for an interactive console" && echo
 

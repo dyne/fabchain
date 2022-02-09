@@ -25,14 +25,14 @@ fi
 echo "Bootnodes: $bootnodes_enr"
 echo
 
-bootnodes_arg=""
+bootnodes_arg=()
 if ! [ "$bootnodes_enr" == "" ]; then
-	bootnodes_arg="--bootnodes $bootnodes_enr"
+	bootnodes_arg=(--bootnodes $bootnodes_enr)
 fi
 
-password_arg=""
+password_arg=()
 if [ -r "${data}/passfile" ]; then
-    password_arg="--password ${data}/passfile"
+    password_arg=(--password ${data}/passfile)
 fi
 
 ## find public IP
