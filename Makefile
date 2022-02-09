@@ -10,7 +10,7 @@ help: ## Display this help.
 
 container := $(shell docker container ls | awk '/dyne\/dyneth/ { print $$1 }')
 
-config:
+config: init
 	@echo "Docker image: '${DOCKER_IMAGE}'"
 	@echo "Chain ID: '${NETWORK_ID}'"
 
@@ -70,7 +70,7 @@ status: ## see if server is running and print public address
 logs: init running
 logs: ## show the logs of the running server
 	@echo "Container running: ${container}"
-	docker logs ${container}
+	docker logs ${container} -f
 
 shell:	init running
 shell:	CMD ?= "bash"
