@@ -1,0 +1,8 @@
+{
+  "signers": [ "INSERT", "SIGNERS", "HERE" ],
+  "epoch": "1644411624",
+  "period": 7,
+  "gaslimit": 31000000,
+  "share": 1048576,
+  "chainid": 1146703429
+}
