@@ -8,4 +8,4 @@ geth --networkid $CONF_NETWORK_ID \
      --nat extip:${pubip} \
      --syncmode "snap" \
      --http --http.addr "0.0.0.0" --http.port $CONF_API_PORT --http.vhosts '*' --http.api web3,eth \
-     --bootnodes ${andrea_enr},${jaromil_enr},${puria_enr}
+     --bootnodes ${bootnodes_enr}

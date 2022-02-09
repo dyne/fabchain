@@ -46,7 +46,10 @@ running:
 run:	init stopped upnp-open
 run: ## start the API node listening on HTTP port
 	@echo "Launching docker container for the HTTP API service:"
-	@docker  run --restart unless-stopped -d --mount "type=bind,source=${CONTRACTS},destination=/contracts" -p ${API_PORT}:${API_PORT} ${DOCKER_IMAGE} \
+	@docker  run --restart unless-stopped -d \
+	--mount "type=bind,source=${CONTRACTS},destination=/contracts" \
+	--mount "type=bind,source=${DATA},destination=/home/geth/.ethereum" \
+	-p ${API_PORT}:${API_PORT} ${DOCKER_IMAGE} \
 	  sh /start-geth-api.sh ${UID}
 	@echo "P2P networking through port 30303"
 	@echo "HTTP API available at port ${API_PORT}"
@@ -57,11 +60,19 @@ run-signer: init stopped upnp-open
 run-signer: ## start the SIGNER node networking on the P2P port
 	@echo "Launching docker container for the SIGNING service:"
 	@docker run --restart unless-stopped -d \
-	--mount type=bind,source=${DATA},destination=/home/geth/.ethereum \
+	--mount "type=bind,source=${DATA},destination=/home/geth/.ethereum" \
 	 -p ${P2P_PORT}:${P2P_PORT}/tcp -p ${P2P_PORT}:${P2P_PORT}/udp \
 	 ${DOCKER_IMAGE} sh /start-geth-signer.sh ${UID}
 	@echo "P2P networking through port ${P2P_PORT}"
 	@echo "run 'make shell' for an interactive console" && echo
+
+run-signer-fg: init stopped upnp-open
+run-signer-fg: ## start the SIGNER node networking on the P2P port
+	@echo "Launching docker container for the SIGNING service in foreground:"
+	@docker run -it \
+	--mount "type=bind,source=${DATA},destination=/home/geth/.ethereum" \
+	 -p ${P2P_PORT}:${P2P_PORT}/tcp -p ${P2P_PORT}:${P2P_PORT}/udp \
+	 ${DOCKER_IMAGE} sh /start-geth-signer.sh ${UID}
 
 status: init
 status: ## see if server is running and print public address
