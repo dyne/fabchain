@@ -25,7 +25,7 @@ echo
 geth --networkid ${CONF_NETWORK_ID} \
      --ipcpath geth.ipc \
      --nat extip:${pubip} \
-     --port ${CONF_P2P_PORT} --nodiscover \
+     --port ${CONF_P2P_PORT} \
      --syncmode "full" \
      --unlock $hexpk --mine \
      --bootnodes ${bootnodes_enr} \

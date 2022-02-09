@@ -82,6 +82,11 @@ status: ## see if server is running and print public address
 		echo "Status: RUNNING" && echo ;\
 	fi
 
+logs: init running
+logs: ## show the logs of the running server
+	@echo "Container running: ${container}"
+	docker logs ${container}
+
 shell:	init running
 shell:	CMD ?= "bash"
 shell: ## open a shell inside running server (CMD=sh or custom)
