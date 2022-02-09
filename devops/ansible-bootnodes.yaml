@@ -1,7 +1,7 @@
 ---
-- name: create enr for each bootnode
+- name: Create the list of bootnodes in enr format
   hosts: fabchain
-  remote_user: utente
+  remote_user: app
   vars:
     ansible_remote_tmp: /tmp
   tasks:
@@ -10,15 +10,26 @@
       src: genesis.json
       dest: ~/dyneth/data
 
-  - name: Read genesis.json
+  - name: Check genesis initialization
+    shell: test -r ~/dyneth/data/geth/chaindata/CURRENT && echo "GenesisInitialized" || echo
+    register: genesis_initialized
+    changed_when: false
+  - name: Initialize data/genesis.json
     command: make genesis-init
     args:
       chdir: ~/dyneth
+    when: genesis_initialized.stdout != "GenesisInitialized"
 
   - local_action: command /bin/rm -f enr*
 
   - name: delete bootnodes.csv
     command: /bin/rm -f ~/dyneth/data/bootnodes.csv
+
+  - name: Stop geth
+    command: make stop
+    ignore_errors: true
+    args:
+      chdir: ~/dyneth
 
   - name: Run signer in background
     command: make run-signer
@@ -34,6 +45,7 @@
     args:
       chdir: ~/dyneth
 
+  - debug: var=enr.stdout
 
   - local_action: copy content={{ enr.stdout_lines.0 }} dest=enr-{{ inventory_hostname }}
 

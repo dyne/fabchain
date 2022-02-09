@@ -1,7 +1,7 @@
 ---
-- name: run all signer
+- name: Dyneth run all signers
   hosts: fabchain
-  remote_user: utente
+  remote_user: app
   vars:
     ansible_remote_tmp: /tmp
   tasks:

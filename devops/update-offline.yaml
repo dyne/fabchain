@@ -1,0 +1,15 @@
+---
+- name: Dyneth update offline (no restart)
+  vars:
+    target_hosts: "{{ lookup('env','DYNETH_HOSTS') or 'fabchain'}}"
+  hosts: "{{ target_hosts }}"
+  remote_user: app
+
+  tasks:
+  - name: pull
+    shell: git checkout . && git pull --rebase && make pull
+    register: pull
+    args:
+      chdir: ~/dyneth
+
+  - debug: var=pull.stdout

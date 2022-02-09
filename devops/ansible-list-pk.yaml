@@ -1,0 +1,19 @@
+---
+- name: List all public keys of nodes
+  hosts: fabchain
+  remote_user: app
+  vars:
+    ansible_remote_tmp: /tmp
+  tasks:
+
+  - local_action: command /bin/rm -f pk*
+
+  - name: Get public address
+    shell: make init 2>&1| awk '/Public address:/ {print $3}'
+    register: pk
+    args:
+      chdir: ~/dyneth
+
+  - local_action: copy content={{ pk.stdout }} dest=pk-{{ inventory_hostname }}
+
+  - debug: var=pk.stdout
