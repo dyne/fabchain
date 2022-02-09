@@ -1,5 +1,18 @@
 data=/home/geth/.ethereum
 
+keys_found=0
+if [ -r ${data}/keystore ]; then
+    kpath=`find ${data}/keystore -type f`
+    if [ ! "x$kpath" = "x" ]; then
+      if [ -r "$kpath" ]; then
+          keys_found=1
+      fi
+    fi
+fi
+eval hexpk=`cat $kpath | awk -F: '/address/ {print $2}' RS=,`
+echo "Public address: $hexpk" >&2
+echo
+
 ## parse bootnodes enr
 bootnodes_csv="$HOME/.ethereum/bootnodes.csv"
 bootnodes_enr=""
