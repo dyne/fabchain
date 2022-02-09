@@ -1,0 +1,11 @@
+---
+- name: make pull all
+  hosts: fabchain
+  remote_user: utente
+  vars:
+    ansible_remote_tmp: /tmp
+  tasks:
+  - name: pull
+    shell: git pull && make pull
+    args:
+      chdir: ~/dyneth

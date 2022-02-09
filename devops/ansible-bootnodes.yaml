@@ -1,0 +1,51 @@
+---
+- name: create enr for each bootnode
+  hosts: fabchain
+  remote_user: utente
+  vars:
+    ansible_remote_tmp: /tmp
+  tasks:
+  - name: copy genesis file on machine
+    copy:
+      src: genesis.json
+      dest: ~/dyneth/data
+
+  - name: Read genesis.json
+    command: make genesis-init
+    args:
+      chdir: ~/dyneth
+
+  - local_action: command /bin/rm -f enr*
+
+  - name: delete bootnodes.csv
+    command: /bin/rm -f ~/dyneth/data/bootnodes.csv
+
+  - name: Run signer in background
+    command: make run-signer
+    args:
+      chdir: ~/dyneth
+
+  - pause:
+      seconds: 5
+
+  - name: Generate enr
+    command: make enr
+    register: enr
+    args:
+      chdir: ~/dyneth
+
+
+  - local_action: copy content={{ enr.stdout_lines.0 }} dest=enr-{{ inventory_hostname }}
+
+  - local_action: command bash join_enr.sh
+
+  - name: Stop geth
+    command: make stop
+    args:
+      chdir: ~/dyneth
+
+  - name: copy bootnodes.csv
+    copy:
+      src: bootnodes.csv
+      dest: ~/dyneth/data
+

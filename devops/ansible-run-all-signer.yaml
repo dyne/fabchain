@@ -1,0 +1,10 @@
+---
+- name: run all signer
+  hosts: fabchain
+  remote_user: utente
+  vars:
+    ansible_remote_tmp: /tmp
+  tasks:
+  - command: make run-signer
+    args:
+      chdir: ~/dyneth

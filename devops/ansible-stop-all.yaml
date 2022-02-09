@@ -1,0 +1,11 @@
+---
+- name: stop all nodes 
+  hosts: fabchain
+  remote_user: utente
+  vars:
+    ansible_remote_tmp: /tmp
+  tasks:
+  - name: Stop geth
+    command: make stop
+    args:
+      chdir: ~/dyneth
