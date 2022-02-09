@@ -173,7 +173,7 @@ tag: ## compute the version tag for current build
 	| xargs -0 sha1sum | sha1sum | awk '{print $$1}' \
 	| tee data/hash.tag
 
-pull: tag ## pull the image from docker-hub online repo
+pull: ## pull the image from docker-hub online repo
 	docker pull ${DOCKER_IMAGE}
 
 push: tag ## push the image to docker-hub online repo
