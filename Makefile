@@ -127,7 +127,6 @@ account: init ## create a new private account in data/keystore
 	  umask 177 ;\
 	  echo "${PASS}" | tee "${DATA}/passfile" >/dev/null ;\
 	  bash ./scripts/account.sh new ;\
-	  rm -rf "${DATA}/passfile" ;\
 	fi
 
 backup: init ## print the private account content as JSON string
