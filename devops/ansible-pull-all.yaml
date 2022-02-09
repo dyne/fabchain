@@ -1,11 +1,23 @@
 ---
-- name: make pull all
+- name: upgrade all signers
   hosts: fabchain
   remote_user: utente
   vars:
     ansible_remote_tmp: /tmp
   tasks:
+
+  - name: stop
+    shell: make stop
+    ignore_errors: true
+    args:
+      chdir: ~/dyneth
+
   - name: pull
-    shell: git pull && make pull
+    shell: git checkout . && git pull --rebase && make pull
+    args:
+      chdir: ~/dyneth
+
+  - name: start
+    shell: make run-signer
     args:
       chdir: ~/dyneth
