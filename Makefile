@@ -11,8 +11,8 @@ help: ## Display this help.
 container := $(shell docker container ls | awk '/dyne\/dyneth/ { print $$1 }')
 
 config:
-	@echo "Docker image: ${DOCKER_IMAGE}"
-	@echo "Chain ID: ${NETWORK_ID}"
+	@echo "Docker image: '${DOCKER_IMAGE}'"
+	@echo "Chain ID: '${NETWORK_ID}'"
 
 init:
 	@bash ./scripts/motd

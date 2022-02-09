@@ -28,5 +28,5 @@ geth --networkid ${CONF_NETWORK_ID} \
      --port ${CONF_P2P_PORT} \
      --syncmode "full" \
      --unlock $hexpk --mine \
-     --bootnodes ${bootnodes_enr} \
-     --password "${data}/passfile"
+     --password "${data}/passfile" \
+	${bootnodes_arg}

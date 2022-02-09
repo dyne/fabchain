@@ -11,6 +11,11 @@ fi
 echo "Bootnodes: $bootnodes_enr"
 echo
 
+bootnodes_arg=""
+if ! [ "$bootnodes_enr" == "" ]; then
+	bootnodes_arg="--bootnodes $bootnodes_enr"
+fi
+
 ## find public IP
 pubip=`curl -s https://ifconfig.me/ip`
 

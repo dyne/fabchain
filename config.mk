@@ -4,8 +4,7 @@ VERSION := 0.6.0
 TAG := $(file <data/hash.tag)
 DOCKER := dyne/dyneth
 DOCKER_IMAGE := ${DOCKER}:${VERSION}-${TAG}
-NETWORK_ID := $(if $(wildcard data/genesis.json), \
-	 $(shell awk '/"chainId":/{sub(/,/,"");print $$2}' data/genesis.json),1146703429)
+NETWORK_ID:=$(if $(wildcard data/genesis.json),$(shell awk '/"chainId":/{sub(/,/,"");print $$2}' data/genesis.json | sed 's/ //g'),1146703429)
 P2P_PORT := 30303
 API_PORT := 8545
 DATA := $(shell pwd)/data
