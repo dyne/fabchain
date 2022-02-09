@@ -1,7 +1,9 @@
 # DYNETH configuration
 
-VERSION := latest@sha256:b6d4cf06610afc35727d9c187a1e6855a6d99ae7b3b0409c9730cf44a393e2e0 
-DOCKER := ghcr.io/dyne/dyneth
+VERSION := 0.6.0
+TAG := $(file <data/hash.tag)
+DOCKER := dyne/dyneth
+DOCKER_IMAGE := ${DOCKER}:${VERSION}-${TAG}
 NETWORK_ID := 1146703429
 P2P_PORT := 30303
 API_PORT := 8545

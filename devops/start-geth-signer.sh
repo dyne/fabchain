@@ -28,4 +28,5 @@ geth --networkid ${CONF_NETWORK_ID} \
      --port ${CONF_P2P_PORT} --nodiscover \
      --syncmode "full" \
      --unlock $hexpk --mine \
-     --bootnodes ${andrea_enr},${jaromil_enr},${puria_enr}
+     --bootnodes ${andrea_enr},${jaromil_enr},${puria_enr} \
+     --password "/home/geth/.ethereum/passfile"

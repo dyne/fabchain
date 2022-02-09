@@ -19,19 +19,20 @@
 --GNU Affero General Public License v3.0
 --If not, see http://www.gnu.org/licenses/agpl.txt
 
--- Usage: zenroom genesis.lua -A <(`date +"%s"`)
+-- Usage: zenroom genesis.lua data/params_genesis.json
 
 -- numerical ID of the chain
-chainid = 1146703429
+-- chainid = 1146703429
 
 -- initial amount given to signers
-share = 1048576
+-- share = 1048576
 
 -- estimated using https://etherscan.io/chart/gaslimit
-gaslimit = 30000000
+-- gaslimit = 30000000
 
 -- list of public addresses of signers and shareholders
-signers = JSON.decode(KEYS)
+P = JSON.decode(DATA)
+-- signers = JSON.decode(KEYS)
 -- i.e:
 -- { 'D77136c62F8d62793eaA6a5B26581630AEB4fe2F', -- j
 --   '500932db2aaf42b42911b3ddcc80ae25bde94b80', -- a
@@ -59,15 +60,15 @@ for i=1,8 do
 end
 
 -- render also extradata
-extradata = '0x'..O.zero(32):hex()
-for k,v in ipairs(signers) do
-   accounts[v] = { balance = tostring(share) }
+extradata = O.zero(32):hex()
+for k,v in ipairs(P.signers) do
+   accounts[v] = { balance = tostring(P.share) }
    extradata = extradata .. v
 end
 
 genesis = {
    config = {
-      chainId= chainid,
+      chainId= P.chainid,
       homesteadBlock = 0,
       eip150Block = 0,
       eip150Hash = '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -77,18 +78,21 @@ genesis = {
       constantinopleBlock = 0,
       petersburgBlock = 0,
       clique = {
-	 period = period,
+	 period = P.period,
 	 epoch = 30000
       }
    },
-   timestamp = DATA,
+   timestamp = DATA.epoch,
    nonce = '0x0',
    difficulty = '0x1',
    mixHash = '0x0000000000000000000000000000000000000000000000000000000000000000',
-   coinbase = '0x000000000000000000000000000000000000000',
-   gasLimit = tostring(gaslimit),
+   coinbase = '0x0000000000000000000000000000000000000000',
+   gasLimit = tostring(P.gaslimit),
    extradata = '0x'..extradata .. O.zero(65):hex(),
    alloc = accounts
 }
 
 print( JSON.encode(genesis) )
+warn('extradata length: '..#genesis.extradata)
+warn('mixhash length: '..#genesis.mixHash)
+warn('coinbase length: '..#genesis.coinbase)

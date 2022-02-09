@@ -46,7 +46,7 @@ running:
 run:	init stopped upnp-open
 run: ## start the API node listening on HTTP port
 	@echo "Launching docker container for the HTTP API service:"
-	@docker  run --restart unless-stopped -d --mount "type=bind,source=${CONTRACTS},destination=/contracts" -p ${API_PORT}:${API_PORT} ${DOCKER}:${VERSION} \
+	@docker  run --restart unless-stopped -d --mount "type=bind,source=${CONTRACTS},destination=/contracts" -p ${API_PORT}:${API_PORT} ${DOCKER_IMAGE} \
 	  sh /start-geth-api.sh ${UID}
 	@echo "P2P networking through port 30303"
 	@echo "HTTP API available at port ${API_PORT}"
@@ -59,7 +59,7 @@ run-signer: ## start the SIGNER node networking on the P2P port
 	@docker run -it \
 	--mount type=bind,source=${DATA},destination=/home/geth/.ethereum \
 	 -p ${P2P_PORT}:${P2P_PORT}/tcp -p ${P2P_PORT}:${P2P_PORT}/udp \
-	 ${DOCKER}:${VERSION} sh /start-geth-signer.sh ${UID}
+	 ${DOCKER_IMAGE} sh /start-geth-signer.sh ${UID}
 	@echo "P2P networking through port ${P2P_PORT}"
 	@echo "run 'make shell' for an interactive console" && echo
 
@@ -124,6 +124,7 @@ account: init ## create a new private account in data/keystore
 	  echo "PASS is not defined" ;\
 	  exit 1 ;\
 	else \
+	  umask 177 ;\
 	  echo "${PASS}" | tee "${DATA}/passfile" >/dev/null ;\
 	  bash ./scripts/account.sh new ;\
 	  rm -rf "${DATA}/passfile" ;\
@@ -139,22 +140,54 @@ restore: init ## ask for private account JSON to restore backup
 	@bash ./scripts/account.sh restore
 
 ##@ Genesis commands
-genesis: epoch := $(shell date +"%s")
-genesis: genesis_tmp := $(shell mktemp)
-genesis: sh_tmp := $(shell mktemp)
-genesis: ## Create a new genesis
-	@bash ./scripts/ask_stakeholders.sh > ${sh_tmp}
-	@echo -n ${epoch} > ${genesis_tmp}
-	@zenroom scripts/genesis.lua -a ${genesis_tmp} -k ${sh_tmp}
-	@rm -f ${sh_tmp} ${genesis_tmp}
+genesis-create: ## Create new genesis parameters in data/params_genesis.json
+	@if ! [ -r data/params_genesis.json ]; then \
+		bash ./scripts/input-genesis.sh ${NETWORK_ID} > data/params_genesis.json; fi
+	@echo
+	@echo "##############################"
+	@echo "EDIT data/params_genesis.json"
+	@echo "then RUN: make genesis-compile"
+	@echo "##############################"
+	@echo
+
+genesis-compile: ## Compile genesis parameters to data/genesis.json
+	@if ! [ -r data/params_genesis.json ]; then \
+		echo "run 'make genesis-create' first"; exit 1; fi
+	@zenroom scripts/genesis.lua -a data/params_genesis.json | jq . | tee data/genesis.json
+	@echo
+	@echo "###########################"
+	@echo "now RUN: make genesis-init"
+	@echo "###########################"
+	@echo
+
+genesis-init: ## Initialize node to use the new chain in data/genesis.json
+	@if ! [ -r data/params_genesis.json ]; then \
+		echo "run 'make genesis-compile' first"; exit 1; fi	
+	@docker run -it \
+	--mount type=bind,source=${DATA},destination=/home/geth/.ethereum \
+	 ${DOCKER_IMAGE} geth init /home/geth/.ethereum/genesis.json
 
 ##@ Development commands
 
-build: ## build the docker container
-	make -C devops
+tag: ## compute the version tag for current build
+	@find devops -type f -print0 | sort -z \
+	| xargs -0 sha1sum | sha1sum | awk '{print $$1}' \
+	| tee data/hash.tag
 
-build-release:
-	make -C devops
+pull: tag ## pull the image from docker-hub online repo
+	docker pull dyne/dyneth:$(file <data/hash.tag)
+
+push: tag ## push the image to docker-hub online repo
+	docker push dyne/dyneth:$(file <data/hash.tag)
+
+build: tag ## build the docker container
+	docker build -t ${DOCKER_IMAGE} \
+	 --build-arg ALPINE_VERSION=${ALPINE_VERSION} \
+	 --build-arg GETH_VERSION=${GETH_VERSION} \
+	 --build-arg SOLC_VERSION=${SOLC_VERSION} \
+	 --build-arg VERSION=${VERSION} --build-arg NETWORK_ID=${NETWORK_ID} \
+	 --build-arg P2P_PORT=${P2P_PORT} --build-arg API_PORT=${API_PORT} \
+	 -f devops/Dockerfile devops
 
 debug:	init stopped
 debug: ## run a shell in a new interactive container (no daemons)
@@ -166,5 +199,5 @@ debug: ## run a shell in a new interactive container (no daemons)
 	 -p ${P2P_PORT}:${P2P_PORT}/udp -p ${API_PORT}:${API_PORT} \
 	 --mount type=bind,source=${DATA},destination=/home/geth/.ethereum \
 	 --mount "type=bind,source=${CONTRACTS},destination=/contracts" \
-	 ${DOCKER}:${VERSION} bash
+	 ${DOCKER_IMAGE} bash
 

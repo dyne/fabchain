@@ -7,7 +7,7 @@ echo "Write the name of the contract (without the extension .sol)"
 read contract
 
 # TODO: improved parameters input
-echo "Write parameters for the contructor"
+echo "Write parameters for the constructor"
 read params
 
 # run solc in the container, the solidity script is in the shared
