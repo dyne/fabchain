@@ -8,26 +8,11 @@ export
 help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' Makefile
 
-all:
-	@echo "Dyneth ${VERSION}" && echo
-	@echo "Server commands:" ;\
-	 echo " make run - start the API node listening on HTTP port ${API_PORT}" ;\
-	 echo " make shell - open a shell inside running server (CMD=sh or custom)" ;\
-	 echo " make status - see if server is running and print public address" ;\
-	 echo " make stop - stop running server" ;\
-	 echo
-	@echo "Account commands:" ;\
-	 echo " make account - create a new private account in ~/.dyneth/keystore" ;\
-	 echo " make backup  - prints the private account contents as JSON string" ;\
-	 echo " make restore - asks for private account string to restore from backup" ;\
-	 echo " make run-signer - start the SIGNER node with current account" ;\
-	 echo
-	@echo "Development commands:" ;\
-	 echo " make debug - run a shell in a new interactive container (no daemons)" ;\
-	 echo " make build - build the local ./Dockerfile as dyne/dyneth:latest" ;\
-	 echo
-
 container := $(shell docker container ls | awk '/dyne\/dyneth/ { print $$1 }')
+
+config:
+	@echo "Docker image: ${DOCKER_IMAGE}"
+	@echo "Chain ID: ${NETWORK_ID}"
 
 init:
 	@bash ./scripts/motd
@@ -94,6 +79,12 @@ shell: ## open a shell inside running server (CMD=sh or custom)
 	@echo "Executing command: ${CMD}" && echo
 	docker exec -it --user geth ${container} ${CMD}
 	@echo && echo "Command executed: ${CMD}" && echo
+
+enr: running ## Obtain the ENR node record (admin.nodeInfo.enr)
+	@if ! [ -r data/geth/chaindata/CURRENT ]; then \
+		echo "No genesis initialized on node"; exit 1; fi
+	@docker exec -it --user geth ${container} geth attach --exec admin.nodeInfo.enr \
+	| xargs | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g"
 
 console: init running
 console: ## open the geth console inside running server
@@ -173,11 +164,6 @@ genesis-init: ## Initialize node to use the new chain in data/genesis.json
 	@docker run -it \
 	 --mount type=bind,source=${DATA},destination=/home/geth/.ethereum \
 	 ${DOCKER_IMAGE} geth init /home/geth/.ethereum/genesis.json
-
-genesis-enr: running ## Obtain the node record (admin.nodeInfo.enr)
-	@if ! [ -r data/geth/chaindata/CURRENT ]; then \
-		echo "No genesis initialized on node"; exit 1; fi
-	docker exec -it --user geth ${container} geth attach --exec admin.nodeInfo.enr
 
 ##@ Development commands
 
