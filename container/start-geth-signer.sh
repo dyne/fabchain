@@ -1,7 +1,5 @@
 #!/bin/sh
 
-data=/home/geth/.ethereum
-
 found=0
 if [ -r ${data}/keystore ]; then
     kpath=`find ${data}/keystore -type f`
@@ -28,5 +26,4 @@ geth --networkid ${CONF_NETWORK_ID} \
      --port ${CONF_P2P_PORT} \
      --syncmode "full" \
      --unlock $hexpk --mine \
-     --password "${data}/passfile" \
-	${bootnodes_arg}
+     ${password_arg} ${bootnodes_arg}

@@ -1,3 +1,4 @@
+data=/home/geth/.ethereum
 
 ## parse bootnodes enr
 bootnodes_csv="$HOME/.ethereum/bootnodes.csv"
@@ -14,6 +15,11 @@ echo
 bootnodes_arg=""
 if ! [ "$bootnodes_enr" == "" ]; then
 	bootnodes_arg="--bootnodes $bootnodes_enr"
+fi
+
+password_arg=""
+if [ -r "${data}/passfile" ]; then
+    password_arg="--password ${data}/passfile"
 fi
 
 ## find public IP
