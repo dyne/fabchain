@@ -95,6 +95,12 @@ shell: ## open a shell inside running server (CMD=sh or custom)
 	docker exec -it --user geth ${container} ${CMD}
 	@echo && echo "Command executed: ${CMD}" && echo
 
+enr: running ## Obtain the ENR node record (admin.nodeInfo.enr)
+	@if ! [ -r data/geth/chaindata/CURRENT ]; then \
+		echo "No genesis initialized on node"; exit 1; fi
+	@docker exec -it --user geth ${container} geth attach --exec admin.nodeInfo.enr \
+	| xargs | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g"
+
 console: init running
 console: ## open the geth console inside running server
 	echo "Console starting" && echo
@@ -173,11 +179,6 @@ genesis-init: ## Initialize node to use the new chain in data/genesis.json
 	@docker run -it \
 	 --mount type=bind,source=${DATA},destination=/home/geth/.ethereum \
 	 ${DOCKER_IMAGE} geth init /home/geth/.ethereum/genesis.json
-
-genesis-enr: running ## Obtain the node record (admin.nodeInfo.enr)
-	@if ! [ -r data/geth/chaindata/CURRENT ]; then \
-		echo "No genesis initialized on node"; exit 1; fi
-	docker exec -it --user geth ${container} geth attach --exec admin.nodeInfo.enr
 
 ##@ Development commands
 
