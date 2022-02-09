@@ -8,25 +8,6 @@ export
 help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' Makefile
 
-all:
-	@echo "Dyneth ${VERSION}" && echo
-	@echo "Server commands:" ;\
-	 echo " make run - start the API node listening on HTTP port ${API_PORT}" ;\
-	 echo " make shell - open a shell inside running server (CMD=sh or custom)" ;\
-	 echo " make status - see if server is running and print public address" ;\
-	 echo " make stop - stop running server" ;\
-	 echo
-	@echo "Account commands:" ;\
-	 echo " make account - create a new private account in ~/.dyneth/keystore" ;\
-	 echo " make backup  - prints the private account contents as JSON string" ;\
-	 echo " make restore - asks for private account string to restore from backup" ;\
-	 echo " make run-signer - start the SIGNER node with current account" ;\
-	 echo
-	@echo "Development commands:" ;\
-	 echo " make debug - run a shell in a new interactive container (no daemons)" ;\
-	 echo " make build - build the local ./Dockerfile as dyne/dyneth:latest" ;\
-	 echo
-
 container := $(shell docker container ls | awk '/dyne\/dyneth/ { print $$1 }')
 
 config:
