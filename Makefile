@@ -17,6 +17,10 @@ config: init
 init:
 	@bash ./scripts/motd
 	@mkdir -p ${DATA}
+	@rm -f ${DATA}/peerconf.sh \
+		&& echo "NETWORK_ID=${NETWORK_ID}" > ${DATA}/peerconf.sh \
+		&& echo "P2P_PORT=${P2P_PORT}" >> ${DATA}/peerconf.sh \
+		&& echo "API_PORT=${API_PORT}" >> ${DATA}/peerconf.sh
 
 stopped:
 	@if [ ! "x${container}" = "x" ]; then \
@@ -184,8 +188,7 @@ build: tag ## build the docker container
 	 --build-arg ALPINE_VERSION=${ALPINE_VERSION} \
 	 --build-arg GETH_VERSION=${GETH_VERSION} \
 	 --build-arg SOLC_VERSION=${SOLC_VERSION} \
-	 --build-arg VERSION=${VERSION} --build-arg NETWORK_ID=${NETWORK_ID} \
-	 --build-arg P2P_PORT=${P2P_PORT} --build-arg API_PORT=${API_PORT} \
+	 --build-arg VERSION=${VERSION} \
 	 -f container/Dockerfile container
 
 debug:	init stopped

@@ -29,14 +29,8 @@ COPY start-geth-api.sh /
 COPY start-geth-signer.sh /
 ARG VERSION
 ENV VERSION $VERSION
-ARG NETWORK_ID
-ENV CONF_NETWORK_ID $NETWORK_ID
-ARG P2P_PORT
-ENV CONF_P2P_PORT $P2P_PORT
-ARG API_PORT
-ENV CONF_API_PORT $API_PORT
 
-EXPOSE $CONF_API_PORT $CONF_P2P_PORT $CONF_P2P_PORT/udp
+# EXPOSE $CONF_API_PORT $CONF_P2P_PORT $CONF_P2P_PORT/udp
 
 RUN mkdir -p /var/mail && useradd -m geth --uid=1000 \
     && echo "geth:geth" | chpasswd \
