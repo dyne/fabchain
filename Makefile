@@ -56,7 +56,7 @@ run: ## start the API node listening on HTTP port
 run-signer: init stopped upnp-open
 run-signer: ## start the SIGNER node networking on the P2P port
 	@echo "Launching docker container for the SIGNING service:"
-	@docker run -it \
+	@docker run --restart unless-stopped -d \
 	--mount type=bind,source=${DATA},destination=/home/geth/.ethereum \
 	 -p ${P2P_PORT}:${P2P_PORT}/tcp -p ${P2P_PORT}:${P2P_PORT}/udp \
 	 ${DOCKER_IMAGE} sh /start-geth-signer.sh ${UID}
@@ -152,11 +152,16 @@ genesis-create: ## Create data/genesis.json from parameters in scripts/params_ge
 	@echo
 
 genesis-init: ## Initialize node to use the new chain in data/genesis.json
-	@if ! [ -r data/params_genesis.json ]; then \
-		echo "run 'make genesis-compile' first"; exit 1; fi	
+	@if ! [ -r data/genesis.json ]; then \
+		echo "run 'make genesis-create' first"; exit 1; fi
 	@docker run -it \
-	--mount type=bind,source=${DATA},destination=/home/geth/.ethereum \
+	 --mount type=bind,source=${DATA},destination=/home/geth/.ethereum \
 	 ${DOCKER_IMAGE} geth init /home/geth/.ethereum/genesis.json
+
+genesis-enr: running ## Obtain the node record (admin.nodeInfo.enr)
+	@if ! [ -r data/geth/chaindata/CURRENT ]; then \
+		echo "No genesis initialized on node"; exit 1; fi
+	docker exec -it --user geth ${container} geth attach --exec admin.nodeInfo.enr
 
 ##@ Development commands
 
