@@ -1,6 +1,14 @@
 HOME ?= $(shell pwd)
 
 include config.mk
+TAG := $(file <data/hash.tag)
+DOCKER_IMAGE := ${DOCKER}:${VERSION}-${TAG}
+NETWORK_ID:=$(if $(wildcard data/genesis.json),\
+$(shell awk '/"chainId":/{sub(/,/,"");print $$2}' data/genesis.json | sed 's/ //g'),1146703429)
+DATA := $(shell pwd)/data
+CONTRACTS := $(shell pwd)/contracts
+UID = $(id -u)
+GID = $(id -g)
 
 export
 
@@ -56,7 +64,7 @@ run-signer: ## start the SIGNER node networking on the P2P port
 	$(info run 'make shell' for an interactive console)
 
 run-signer-fg: init stopped upnp-open
-run-signer-fg: ## start the SIGNER node networking on the P2P port
+run-signer-fg:
 	$(info Launching docker container for the SIGNING service in foreground:)
 	@docker run -it \
 	--mount "type=bind,source=${DATA},destination=/home/geth/.ethereum" \
