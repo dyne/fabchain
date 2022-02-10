@@ -1,23 +1,15 @@
+#!/bin/bash
+
 set -e
 # Deploy a contract given the solidity script on a network
 
-. scripts/secret-lib.sh
+. scripts/host-lib.sh
 
-echo "Write the name of the contract (without the extension .sol)"
-read contract
+contract="$1"
+params="$2"
+sk=`secret_key`
 
-# TODO: improved parameters input
-echo "Write parameters for the constructor"
-read params
-
-# run solc in the container, the solidity script is in the shared
-# directory "contracts"
-docker exec -it ${container} sh -c "cd /contracts && solc --overwrite --bin --abi \"${contract}.sol\" -o build"
-
-secret_key
-
-tmp=`mktemp`
-cat <<EOF >$tmp
+cat <<EOF
 from web3 import Web3, HTTPProvider
 
 abi = None
@@ -51,8 +43,3 @@ txid=w3.eth.sendRawTransaction(signed.rawTransaction).hex()
 
 print("Transaction id: {}".format(txid))
 EOF
-
-cat $tmp | docker exec -i ${container} python3
-
-
-rm -rf $tmp

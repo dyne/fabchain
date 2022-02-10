@@ -43,3 +43,27 @@ function pk() {
     conf=${1:-`find ${R}/keystore/ -type f`}
     echo "print(JSON.decode(DATA).address)" | zenroom -a $conf 2> /dev/null
 }
+
+secret_key() {
+  keystore=`find ${R}/keystore/ -type f`
+  passwd=`cat ${R}/passfile`
+
+  cat <<EOF | python
+from web3.auto import w3
+import os
+
+# Find the first file in the keystore
+path = "/home/geth/.ethereum/keystore"
+keyfile_path = None
+for file in os.listdir(path):
+  file = os.path.join(path, file)
+  if os.path.isfile(file):
+    keyfile_path = file
+    break
+
+with open(keyfile_path) as keyfile:
+    encrypted_key = keyfile.read()
+    private_key = w3.eth.account.decrypt(encrypted_key, '${passwd}')
+    print(private_key.hex())
+EOF
+}
