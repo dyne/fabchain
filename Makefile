@@ -125,18 +125,25 @@ upnp-close: ## close UPNP port-forwarding on LAN router
 	@sh ./scripts/upnp.sh close ${P2P_PORT} tcp \
 	&& sh ./scripts/upnp.sh close ${P2P_PORT} udp
 
+##@ Contract commands
+
 contract-deploy: web3_deploy.py := $(shell mktemp)
-contract-deploy: init running
-	$(if $(SOL),,$(error "Contract file not specified, use SOL=contracts/file.sol"))
+contract-deploy: init running ## deploy a web3 smart-contract in SOL=contracts/file.sol
+	$(if ${SOL},,$(error "Contract file not specified, use SOL=contracts/file.sol"))
 	@docker exec -it ${container} sh -c \
 	 "cd /contracts && solc --overwrite --bin --abi '$(notdir ${SOL})' -o build"
 	@find contracts/build -type f
-	bash ./scripts/mk_web3_deploy.sh \
+	@bash ./scripts/mk_web3_deploy.sh \
 	 $(notdir $(basename ${SOL})) ${PARAMS} > ${web3_deploy.py}
-	cat ${web3_deploy.py} | docker exec -i ${container} python3
+	@cat ${web3_deploy.py} | docker exec -i ${container} python3
+	@rm -f ${web3_deploy.py}
 
-receipt: init
-	@bash ./scripts/receipt.sh
+contract-info: web_info.py := $(shell mktemp)
+contract-info: init ## obtain contract information about the TXID=hash
+	$(if ${TDIX},,$(error "Transaction ID not specified, use TXID=hash"))
+	@sh ./scripts/mk_web3_info.sh ${TXID} > ${web_info.py}
+	@cat ${web3_info.py} | docker exec -i ${container} python3
+	@rm -f ${web_info.py}
 
 ##@ Account commands:
 account: init ## create a new private account in data/keystore

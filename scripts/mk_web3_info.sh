@@ -1,13 +1,10 @@
-echo "Write the transaction hash"
-read TXID
-
-tmp=`mktemp`
-cat <<EOF >$tmp
+TXID=$1
+cat <<EOF
 from web3 import Web3, HTTPProvider
 import json
 from hexbytes import HexBytes
 
-w3 = Web3(HTTPProvider('http://85.93.88.149:8545'))
+w3 = Web3(HTTPProvider('http://127.0.0.1:8545'))
 
 try:
   tx = dict(w3.eth.getTransactionReceipt("$TXID"))
@@ -20,8 +17,3 @@ except Exception as e:
         "otherwise the transaction hasn't been accepted yet")
   print("Error: {}".format(e))
 EOF
-
-cat $tmp | docker exec -i ${container} python3
-
-
-rm -rf $tmp
