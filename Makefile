@@ -148,7 +148,7 @@ contract-info: web_info.py := $(shell mktemp)
 contract-info: init ## obtain contract information about the TXID=hash
 	$(if ${TXID},,$(error "Transaction ID not specified, use TXID=hash"))
 	@sh ./scripts/mk_web3_info.sh ${TXID} > ${web_info.py}
-	@cat ${web3_info.py} | docker exec -i ${container} python3
+	@cat ${web_info.py} | docker exec -i ${container} python3
 	@rm -f ${web_info.py}
 
 ##@ Account commands:
