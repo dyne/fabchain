@@ -133,17 +133,20 @@ upnp-close: ## close UPNP port-forwarding on LAN router
 contract-deploy: web3_deploy.py := $(shell mktemp)
 contract-deploy: init running ## deploy a web3 smart-contract in SOL=contracts/file.sol
 	$(if ${SOL},,$(error "Contract file not specified, use SOL=contracts/file.sol"))
+	$(if ${GAS_LIMIT},,$(error "Specify gas limit with GAS_LIMIT=21000"))
+	$(if ${GAS_PRICE},,$(error "Specify gas price in Wei with GAS_PRICE=1000000"))
+	$(if ${PARAMS},,$(error "Missing params, PARAMS=\"\""))
 	@docker exec -it ${container} sh -c \
 	 "cd /contracts && solc --overwrite --bin --abi '$(notdir ${SOL})' -o build"
 	@find contracts/build -type f
 	@bash ./scripts/mk_web3_deploy.sh \
-	 $(notdir $(basename ${SOL})) ${PARAMS} > ${web3_deploy.py}
+	 $(notdir $(basename ${SOL})) ${PARAMS} ${GAS_PRICE} ${GAS_LIMIT} >${web3_deploy.py}
 	@cat ${web3_deploy.py} | docker exec -i ${container} python3
 	@rm -f ${web3_deploy.py}
 
 contract-info: web_info.py := $(shell mktemp)
 contract-info: init ## obtain contract information about the TXID=hash
-	$(if ${TDIX},,$(error "Transaction ID not specified, use TXID=hash"))
+	$(if ${TXID},,$(error "Transaction ID not specified, use TXID=hash"))
 	@sh ./scripts/mk_web3_info.sh ${TXID} > ${web_info.py}
 	@cat ${web3_info.py} | docker exec -i ${container} python3
 	@rm -f ${web_info.py}

@@ -7,6 +7,8 @@ set -e
 
 contract="$1"
 params="$2"
+gas_price="$3"
+gas_limit="$4"
 sk=`secret_key`
 
 cat <<EOF
@@ -34,8 +36,8 @@ my_contract = w3.eth.contract(abi=abi, bytecode=bin)
 construct_txn = my_contract.constructor($params).buildTransaction({
     'from': account.address,
     'nonce': w3.eth.getTransactionCount(account.address),
-    'gas': 8000000,
-    'gasPrice': w3.toWei('100', 'gwei')})
+    'gas': ${gas_limit},
+    'gasPrice': ${gas_price}})
 
 signed = account.signTransaction(construct_txn)
 
