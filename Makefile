@@ -109,6 +109,9 @@ stop: ## stop running server
 	@sh ./scripts/upnp.sh close ${P2P_PORT} tcp ;\
 	 sh ./scripts/upnp.sh close ${P2P_PORT} udp
 
+get-gas-price:
+	@bash ./scripts/mk_web3_gasprice.sh | docker exec -i ${container} python3
+
 ##@ Network commands
 
 upnp-open: upnpc=$(shell which upnpc)
