@@ -23,6 +23,7 @@
         - git
         - tree
         - tmux
+        - jq
       state: latest
 
   - name: check docker installed

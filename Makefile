@@ -41,16 +41,18 @@ running:
 
 ##@ Server commands
 
-run:	init stopped upnp-open
+run: ARGS ?= --syncmode snap --http.vhosts '*' --http.corsdomain "http://localhost:8000/"
+run: init stopped upnp-open
 run: ## start the API node listening on HTTP port
+	$(info Using image: ${DOCKER_IMAGE})
 	$(info Launching docker container for the HTTP API service:)
 	@docker  run --restart unless-stopped -d \
 	--mount "type=bind,source=${CONTRACTS},destination=/contracts" \
 	--mount "type=bind,source=${DATA},destination=/home/geth/.ethereum" \
 	-p ${API_PORT}:${API_PORT} ${DOCKER_IMAGE} \
-	  bash /start-geth-api.sh ${UID} ${SYNCMODE}
+	  bash /start-geth-api.sh "${UID}" "${ARGS}"
 	$(info P2P networking through port ${P2P_PORT})
-	$(info HTTP API available at port ${API_PORT})
+	$(info HTTP API available at http://127.0.0.1:${API_PORT})
 	$(info run 'make console' to attach the geth console)
 	$(info run 'make shell' to attach the running docker)
 
@@ -117,14 +119,14 @@ get-gas-price:
 upnp-open: upnpc=$(shell which upnpc)
 upnp-open: ## open UPNP port-forwarding on LAN router
 	$(if $(wildcard ${upnpc}),,\
-		$(warning "UPNP client not found, unable to open P2P port forwarding"))
+		$(info UPNP client not found, unable to open P2P port forwarding))
 	@sh ./scripts/upnp.sh open ${P2P_PORT} tcp \
 	&& sh ./scripts/upnp.sh open ${P2P_PORT} udp
 
 upnp-close: upnpc=$(shell which upnpc)
 upnp-close: ## close UPNP port-forwarding on LAN router
 	$(if $(wildcard ${upnpc}),,\
-		$(warning "UPNP client not found, unable to close P2P port forwarding"))
+		$(info UPNP client not found, unable to close P2P port forwarding))
 	@sh ./scripts/upnp.sh close ${P2P_PORT} tcp \
 	&& sh ./scripts/upnp.sh close ${P2P_PORT} udp
 
@@ -132,9 +134,9 @@ upnp-close: ## close UPNP port-forwarding on LAN router
 
 contract-deploy: web3_deploy.py := $(shell mktemp)
 contract-deploy: init running ## deploy a web3 smart-contract in SOL=contracts/file.sol
-	$(if ${SOL},,$(error "Contract file not specified, use SOL=contracts/file.sol"))
-	$(if ${GAS_LIMIT},,$(error "Specify gas limit with GAS_LIMIT=21000"))
-	$(if ${GAS_PRICE},,$(error "Specify gas price in Wei with GAS_PRICE=1000000"))
+	$(if ${SOL},,$(error Contract file not specified, use SOL=contracts/file.sol))
+	$(if ${GAS_LIMIT},,$(error Specify gas limit with GAS_LIMIT=21000))
+	$(if ${GAS_PRICE},,$(error Specify gas price in Wei with GAS_PRICE=1000000))
 	$(if ${PARAMS},,$(error "Missing params, PARAMS=\"\""))
 	@docker exec -it ${container} sh -c \
 	 "cd /contracts && solc --overwrite --bin --abi '$(notdir ${SOL})' -o build"
@@ -146,7 +148,7 @@ contract-deploy: init running ## deploy a web3 smart-contract in SOL=contracts/f
 
 contract-info: web_info.py := $(shell mktemp)
 contract-info: init ## obtain contract information about the TXID=hash
-	$(if ${TXID},,$(error "Transaction ID not specified, use TXID=hash"))
+	$(if ${TXID},,$(error Transaction ID not specified, use TXID=hash))
 	@sh ./scripts/mk_web3_info.sh ${TXID} > ${web_info.py}
 	@cat ${web_info.py} | docker exec -i ${container} python3
 	@rm -f ${web_info.py}
@@ -169,8 +171,7 @@ restore: init ## ask for private account JSON to restore backup
 
 ##@ Genesis commands
 genesis-create: ## Create data/genesis.json from parameters in scripts/params_genesis.json
-	@if [ -r data/genesis.json ]; then \
-		echo "Cannot overwrite data/genesis.json"; exit 1; fi
+	$(if $(wildcard data/genesis.json), $(error Cannot overwrite data/genesis.json))
 	$(if $(wildcard scripts/params_genesis.json),,\
 		$(error Genesis parameters not found in scripts/params_genesis.json))
 	@zenroom scripts/genesis.lua -a scripts/params_genesis.json | jq . | tee data/genesis.json
@@ -195,7 +196,9 @@ tag: ## compute the version tag for current build
 	@mkdir -p data
 	@find container -type f -print0 | sort -z \
 	| xargs -0 sha1sum | sha1sum | awk '{print $$1}' \
-	| tee data/hash.tag
+	| tee data/hash.tag.new \
+	&& (diff -q data/hash.tag.new data/hash.tag; return 0) \
+	&& mv data/hash.tag.new data/hash.tag
 
 pull: ## pull the image from docker-hub online repo
 	docker pull ${DOCKER_IMAGE}

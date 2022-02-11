@@ -1,4 +1,8 @@
+#!/bin/bash
+
 data=/home/geth/.ethereum
+
+function info() { echo 2>& "$1"; }
 
 keys_found=0
 if [ -r ${data}/keystore ]; then
@@ -10,8 +14,7 @@ if [ -r ${data}/keystore ]; then
     fi
 fi
 eval hexpk=`cat $kpath | awk -F: '/address/ {print $2}' RS=,`
-echo "Public address: $hexpk" >&2
-echo
+info "Public address: $hexpk"
 
 ## parse bootnodes enr
 bootnodes_csv="$HOME/.ethereum/bootnodes.csv"
@@ -21,9 +24,11 @@ if [ -r "$bootnodes_csv" ]; then
 	if ! [ "$bootnodes_enr" == "" ]; then bootnodes_enr="${bootnodes_enr},"; fi
 	bootnodes_enr="${bootnodes_enr}$(echo $i | cut -d' ' -f2)"
     done < $bootnodes_csv
+else
+    info "ERROR: missing network bootnodes in data/bootnodes.csv"
+    exit 1
 fi
-echo "Bootnodes: $bootnodes_enr"
-echo
+info "Bootnodes: $bootnodes_enr"
 
 bootnodes_arg=()
 if ! [ "$bootnodes_enr" == "" ]; then
@@ -38,10 +43,10 @@ fi
 ## find public IP
 pubip=`curl -s https://ifconfig.me/ip`
 
-echo "Public IP: $pubip"
-echo
+info "Public IP: $pubip"
+
 
 [[ "$1" == "" ]] || {
-	print "UID: $1"
+	info "UID: $1"
 	sed -e "s/1000/$1/" -i /etc/passwd
 }
