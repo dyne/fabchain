@@ -11,4 +11,5 @@ geth --networkid $NETWORK_ID \
      --http --http.addr "0.0.0.0" \
      --http.port $API_PORT --http.vhosts '*' \
      --http.api web3,eth,net \
+     --http.corsdomain "http://localhost:8000/"
      ${password_arg[@]} ${bootnodes_arg[@]}
