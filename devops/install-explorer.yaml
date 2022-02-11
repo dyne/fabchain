@@ -1,0 +1,29 @@
+---
+- name: install the block explorer
+  hosts: fabchainexplorer
+  remote_user: app
+  tasks:
+    - name: Install nvm
+      shell: >
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+        creates=/home/{{ ansible_user_id }}/.nvm/nvm.sh
+
+    - name: Install node and set version 8
+      shell: >
+        /bin/bash -c "source ~/.nvm/nvm.sh && nvm install 8 && nvm alias default 8"
+        creates=/home/{{ ansible_user_id }}/.nvm/alias
+
+    - name: clone block explorer
+      git: repo=https://github.com/etherparty/explorer dest=~/explorer force=true
+
+    - name: start the API node
+      shell: make run ARGS="--syncmode snap --http.vhosts '*' --http.corsdomain 'http://159.69.208.164:8000'"
+      args:
+        chdir: ~/dyneth
+
+    - name: start the block explorer
+      shell: /bin/bash -c "source ~/.nvm/nvm.sh && tmux new -d -s explorer 'sed -i '\''s/localhost/0.0.0.0/g'\'' package.json && sed -i '\''s/localhost/159.69.208.164/g'\'' app/app.js  && npm start'"
+      args:
+        chdir: ~/explorer
+
+
