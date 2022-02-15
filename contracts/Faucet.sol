@@ -35,7 +35,7 @@ contract Faucet {
 
   //function to send tokens from faucet to an address
   function transfer(address payable _requestor) public payable {
-    require(block.timestamp > lockTime[msg.sender], "lock time has not expired. Please try again later");
+    require(block.timestamp > lockTime[_requestor], "lock time has not expired. Please try again later");
 
     // This would be an improvement but it doesn't work at the moment
     //require(address(this).balance > amountAllowed, "Not enough funds in the faucet. Please donate");
@@ -43,7 +43,7 @@ contract Faucet {
     (bool sent, ) = _requestor.call{value: amountAllowed}("");
     require(sent, "Failed to send Ether");
 
-    lockTime[msg.sender] = block.timestamp + 1 days;
+    lockTime[_requestor] = block.timestamp + 1 days;
   }
 }
 

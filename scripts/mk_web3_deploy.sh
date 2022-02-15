@@ -29,7 +29,7 @@ if not abi or not bin:
 
 sk = "$sk"
 
-w3 = Web3(HTTPProvider('http://localhost:8545'))
+w3 = Web3(HTTPProvider('http://127.0.0.1:8545'))
 account = w3.eth.account.privateKeyToAccount(sk)
 
 my_contract = w3.eth.contract(abi=abi, bytecode=bin)
