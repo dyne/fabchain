@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+    <script>
+$(function() {
+  $('#btnRequest').click(function() {
+    $.ajax({
+      method: "GET",
+      url: "/faucet",
+      contentType: "application/json",
+      data: { address: $('#txtAddress').val() }
+    })
+    .done(function( msg ) {
+      if(msg.success) {
+        $('#divStatus').html("Transaction committed with hash: " + msg.txid)
+      } else {
+        $('#divStatus').html("An error occurred while committing the transaction: "
+                + msg.error)
+      }
+    });
+  });
+});
+    </script>
+  </head>
+  <body>
+    <div>
+      Viene utilizzato il contratto all'indirizzo {{ contract_address }}<br/>
+      <input type="text" id="txtAddress">
+      <button id="btnRequest">Send request</button>
+    </div>
+    <div id="divStatus">
+      Il bilancio attuale del faucet è {{ balance }} eth
+    </div>
+  </body>
+</html>
