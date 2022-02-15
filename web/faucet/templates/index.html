@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
     <script>
 $(function() {
@@ -13,7 +15,9 @@ $(function() {
     })
     .done(function( msg ) {
       if(msg.success) {
-        $('#divStatus').html("Transaction committed with hash: " + msg.txid)
+        $('#divStatus').html("Transaction committed with hash: " +
+                "<a href=\"http://test.fabchain.net:8000/#/transaction/" +
+                msg.txid + "\">" + msg.txid + "</a>")
       } else {
         $('#divStatus').html("An error occurred while committing the transaction: "
                 + msg.error)
@@ -22,15 +26,33 @@ $(function() {
   });
 });
     </script>
+    <style>
+.spnAddress {
+  font: monospace;
+}
+    </style>
   </head>
   <body>
-    <div>
-      Viene utilizzato il contratto all'indirizzo {{ contract_address }}<br/>
-      <input type="text" id="txtAddress">
-      <button id="btnRequest">Send request</button>
-    </div>
-    <div id="divStatus">
-      Il bilancio attuale del faucet è {{ balance }} eth
-    </div>
+    <section class="section columns">
+      <div class="column">
+        <img src="{{url_for('static', filename='logo.jpg')}}" alt="Fabcity Hamburg logo">
+      </div>
+      <div class="container column is-two-thirds">
+        Faucet address <span class="spnAddress">{{ contract_address }}</span><br/>
+        <div class="field has-addons">
+          <p class="control">
+            <input class="input" type="text" placeholder="Address" id="txtAddress">
+          </p>
+          <p class="control">
+            <button id="btnRequest" class="button">
+              Send request
+            </button>
+          </p>
+        </div>
+        <div id="divStatus" class="container">
+          The current balance of the faucet is {{ balance }} eth
+        </div>
+      </div>
+    </section>
   </body>
 </html>
