@@ -23,7 +23,7 @@ geth --networkid $NETWORK_ID \
      --nat extip:${pubip} \
      --http --http.addr "0.0.0.0" \
      --http.port $API_PORT --http.vhosts '*' \
-     --http.api web3,eth,net \
+     --http.api personal,web3,eth,net \
      ${password_arg[@]} ${bootnodes_arg[@]} \
      ${args[@]}
 
