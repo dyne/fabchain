@@ -41,7 +41,7 @@ running:
 
 ##@ Server commands
 
-run: ARGS ?= --syncmode snap --http.vhosts '*' --http.corsdomain '*'
+run: ARGS ?= --syncmode snap --http.vhosts "*" --http.corsdomain "*"
 run: init stopped upnp-open
 run: ## start the API node listening on HTTP port
 	$(info Using image: ${DOCKER_IMAGE})
