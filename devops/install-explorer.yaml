@@ -16,13 +16,8 @@
     - name: clone block explorer
       git: repo=https://github.com/etherparty/explorer dest=~/explorer force=true
 
-    - name: start the API node
-      shell: make run ARGS="--syncmode snap --http.vhosts '*' --http.corsdomain 'http://159.69.208.164:8000'"
-      args:
-        chdir: ~/dyneth
-
     - name: start the block explorer
-      shell: /bin/bash -c "source ~/.nvm/nvm.sh && tmux new -d -s explorer 'sed -i '\''s/localhost/0.0.0.0/g'\'' package.json && sed -i '\''s/localhost/159.69.208.164/g'\'' app/app.js  && npm start'"
+      shell: /bin/bash -c "source ~/.nvm/nvm.sh && tmux new -d -s explorer 'sed -i '\''s/localhost/{{ inventory_hostname }}/g'\'' package.json && sed -i '\''s/localhost/{{ inventory_hostname }}/g'\'' app/app.js  && npm start'"
       args:
         chdir: ~/explorer
 
