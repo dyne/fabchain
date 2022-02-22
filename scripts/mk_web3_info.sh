@@ -29,7 +29,6 @@ try:
   tx = w3.eth.getTransactionReceipt("$TXID")
   tx = toDict(tx)
   tx = json.dumps(tx, indent=2)
-  print("Transaction recipe")
   print(tx)
 except Exception as e:
   print("Could not read transaction. Make sure the transaction hash is correct, "+
