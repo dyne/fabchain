@@ -24,6 +24,7 @@
         - tree
         - tmux
         - jq
+        - bc
       state: latest
 
   - name: check docker installed
@@ -60,21 +61,7 @@
       uid: 1000
       home: /home/app
 
-  - name: log in as root and clone dyneth as app
-    become: true
-    become_user: "app"
-    shell:
-      cd ~ \
-      && rm -rf dyneth \
-      && git clone {{ dyneth_repo }} dyneth \
-      && cd dyneth \
-      && make account PASS={{ geth_pass }}
-    register: geth_account_pass
-
   - name: copy ssh keys from root to app
     shell:
       cp -ra ~/.ssh /home/app/ \
       && chown -R app:app /home/app/.ssh
-
-  - name: log geth address
-    debug: var=geth_account_pass.stdout

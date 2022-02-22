@@ -69,7 +69,11 @@ send-funds: ## Send an amount of funds from each signer to an address (default 1
 
 list-addresses: CMD := eth.accounts[0]
 list-addresses: inventory ## list all app public addressess
-	@make -s remote-exec CMD="eth.accounts[0]" ON=sign
+	@echo; echo "### Signers:"
+	@make -s remote-shell CMD="make status 2>&1 | awk '/Public address/ {print $$3}'" ON=sign
+	@echo; echo; echo "### Api:"
+	@make -s remote-shell CMD="make status 2>&1 | awk '/Public address/ {print $$3}'" ON=api
+	@echo
 
 init-genesis: inventory ## initialize genesis on all nodes
 	$(if $(wildcard genesis.json),,$(error Genesis file not found))
@@ -113,9 +117,12 @@ inventory: ## create an ansible inventory (used internally)
 	| awk '/api/{print $$2}' >> hosts.toml
 
 install: ssh-keygen inventory
-install: ## install all servers and create new accounts
+install: ## install all servers
 	$(call ANSIPLAY, install.yaml)
 install-steps: steps
+
+create-accounts: inventory ## create accounts on all servers
+	$(call ANSIPLAY, create-accounts.yaml)
 
 install-explorer: inventory ## install the block explorer on the api node
 	$(call ANSIPLAY, install-explorer.yaml)

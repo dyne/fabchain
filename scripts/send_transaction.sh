@@ -9,7 +9,7 @@ destaddr=$1
 echo >&2 "API Address to fund: $destaddr"
 
 eth_amount=$2
-wei_amount=`echo "$1 * 10^18" | bc -l`
+wei_amount=`echo "$eth_amount * 10^18" | bc -l`
 echo >&2 "Amount to fund: $wei_amount"
 
 make command \

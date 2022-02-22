@@ -157,7 +157,8 @@ made with:
 cd devops
 make server-create    # creates 3 signers and 1 api server
 make install          # instals all servers with dyneth
-make list-addressess
+make create-accounts  # creates dyneth accounts
+make list-addressess  # prints dyneth account addresses
 cd -
 ```
 
