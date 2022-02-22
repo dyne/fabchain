@@ -26,7 +26,7 @@ geth --networkid $NETWORK_ID \
      --http.port $API_PORT --http.vhosts '*' \
      --http.api personal,web3,eth,net \
      ${password_arg[@]} ${bootnodes_arg[@]} \
-     ${args[@]}
+     ${args[@]} 2> /home/geth/.ethereum/geth.log
 
 if [ -r ${data}/post-execution-script.sh ]; then
     . ${data}/post-execution-script.sh
