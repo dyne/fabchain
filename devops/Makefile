@@ -32,7 +32,7 @@ remote-exec: ON ?= sign
 remote-exec: IPS := $(shell hcloud server list -o noheader -o columns=name,ipv4 | awk '/${ON}/{print $$2}' | xargs)
 remote-exec: CMD ?= eth.getBalance(eth.accounts[0])
 remote-exec: ## execute a geth console command on all signers
-	@for i in ${IPS}; do echo -n >&2 "\nHost: $$i" ; ssh -i ./sshkey \
+	@for i in ${IPS}; do echo >&2 "\nHost: $$i" ; ssh -i ./sshkey \
 	  -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes \
 	  "app@$$i" "cd dyneth && make command CMD='${CMD}' 2>/dev/null" ;\
 	done
@@ -45,6 +45,25 @@ remote-shell: ## execute a shell command on all signers
 	  -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes \
 	  "app@$$i" "cd dyneth && TERM=linux ${CMD}" ;\
 	done
+
+remote-copy: ON ?= sign
+remote-copy: IPS := $(shell hcloud server list -o noheader -o columns=name,ipv4 | awk '/${ON}/{print $$2}' | xargs)
+remote-copy: FILE ?= bootnodes.csv
+remote-copy: ## upload a file on all nodes
+	$(if $(wildcard ${FILE}),,$(error File not found: ${FILE}))
+	@for i in ${IPS}; do scp -i ./sshkey \
+	  -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes \
+	  ${FILE} "app@$$i:dyneth/data/" ; \
+	done
+
+##@ Treasury management
+
+send-funds: ADDR ?= $(shell make remote-exec CMD="eth.accounts[0]" ON=api | xargs)
+send-funds: AMOUNT ?= 1
+send-funds: ## Send an amount of funds from each signer to an address (default 1 to API)
+	$(info API address: ${ADDR})
+	$(info Amount to fund from each signer: ${AMOUNT})
+	make remote-shell CMD='bash scripts/send_transaction.sh ${ADDR} ${AMOUNT}'
 
 ##@ Genesis management
 

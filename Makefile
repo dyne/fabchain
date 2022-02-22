@@ -89,10 +89,10 @@ logs: ## show the logs of the running server
 shell:	init running
 shell:	CMD ?= "bash"
 shell: ## open a shell inside running server (CMD=sh or custom)
-	$(info "Container running: ${container}")
-	$(info "Executing command: ${CMD}")
-	docker exec -it --user geth ${container} ${CMD}
-	$(info Command executed: ${CMD})
+	@echo >&2 "Container running: ${container}"
+	@echo >&2 "Executing command: ${CMD}"
+	@docker exec -it --user geth ${container} ${CMD}
+	@echo >&2 "Command executed: ${CMD}"
 
 enr: running ## Obtain the ENR node record (admin.nodeInfo.enr)
 	$(if $(wildcard data/geth/chaindata/CURRENT),,\
@@ -102,17 +102,17 @@ enr: running ## Obtain the ENR node record (admin.nodeInfo.enr)
 
 console: init running
 console: ## open the geth console inside running server
-	$(info Console starting)
+	@echo >&2 "Console starting"
 	docker exec -it --user geth ${container} geth attach
 
 command: CMD ?= eth.getBalance(eth.accounts[0])
 command: init running
-	$(info Executing command: ${CMD})
+	@echo >&2 "Executing command: ${CMD}"
 	@docker exec --user geth ${container} geth attach --exec "${CMD}"
 
 stop:	init running upnp-close
 stop: ## stop running server
-	$(info Stopping container: ${container})
+	@echo >&2 "Stopping container: ${container}"
 	@docker container stop ${container}
 	@sh ./scripts/upnp.sh close ${P2P_PORT} tcp ;\
 	 sh ./scripts/upnp.sh close ${P2P_PORT} udp
