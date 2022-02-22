@@ -19,7 +19,8 @@ container := $(shell docker container ls | awk '/dyne\/dyneth/ { print $$1 }')
 
 config: init
 	$(info Docker image: '${DOCKER_IMAGE}')
-	$(info Chain ID: '${NETWORK_ID}')
+	$(info Chain ID string: \
+	$(shell echo "print(BIG.from_decimal(${NETWORK_ID}):octet():string())" | zenroom 2>/dev/null))
 	@cat ${DATA}/peerconf.sh
 
 init:
@@ -28,8 +29,8 @@ init:
 	$(file > ${DATA}/peerconf.sh,NETWORK_ID=${NETWORK_ID})
 	$(file >> ${DATA}/peerconf.sh,P2P_PORT=${P2P_PORT})
 	$(file >> ${DATA}/peerconf.sh,API_PORT=${API_PORT})
-	$(if $(wildcard data/genesis.conf),$(if $(wildcard devops/genesis.conf),\
-		$(shell diff data/genesis.conf devops/genesis.conf)))
+	$(if $(wildcard data/genesis.conf),$(if $(wildcard devops/genesis.conf),$(shell diff data/genesis.conf devops/genesis.conf)))
+	@$(if $(wildcard devops/bootnodes.csv),cp -v devops/bootnodes.csv data/)
 
 stopped:
 	$(if ${container},\
@@ -103,6 +104,11 @@ console: init running
 console: ## open the geth console inside running server
 	$(info Console starting)
 	docker exec -it --user geth ${container} geth attach
+
+command: CMD ?= eth.getBalance(eth.accounts[0])
+command: init running
+	$(info Executing command: ${CMD})
+	docker exec -it --user geth ${container} geth attach --exec "${CMD}"
 
 stop:	init running upnp-close
 stop: ## stop running server
