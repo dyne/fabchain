@@ -1,7 +1,13 @@
+include config.mk
 
 ##@ General
 help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>[-steps] (play target or just show its -steps)\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' Makefile
+
+ssh-keygen: ## generate a dedicated ssh keypair here
+	$(if $(wildcard ${sshkey}),, \
+		$(info Generating ssh keypair) \
+		ssh-keygen -t ed25519 -f ${sshkey} -q -N '')
 
 steps:
 	@cat $(subst -steps,,${MAKECMDGOALS}).yaml | grep '\- name'
@@ -37,6 +43,7 @@ list-bootnodes: play ## list all app ENR addresses and write data/bootnodes.csv
 list-bootnodes-steps: steps
 
 ##@ Server management
+
 inventory:
 inventory:
 	@echo "[sign]" > hosts.toml
@@ -47,13 +54,19 @@ inventory:
 	| awk '/api/{print $$2}' >> hosts.toml
 	@cat hosts.toml
 
-hcloud-create: ## create all servers on hcloud, 3 signers and 1 api
-	./hcloud-create-3-1.sh
+list-datacenters:
+	@curl -sLH "Authorization: Bearer ${API_TOKEN}" \
+	'https://api.hetzner.cloud/v1/datacenters' \
+	| awk '/name.*-dc/{ print $$2 }' | sed 's/,//' | xargs
 
-hcloud-servers: CMD ?= describe
-hcloud-servers:
+server-create: DATACENTERS := "nbg1-dc3 hel1-dc2 fsn1-dc14"
+server-create: ## create all servers on hcloud, 3 signers and 1 api
+	bash ./hcloud-create-3-1.sh ${DATACENTERS}
+
+server-cmd: CMD ?= describe
+server-cmd:
 	./hcloud-server-foreach.sh ${CMD}
 
-list-uptimes: play ## list all server uptimes
+list-uptimes: inventory play ## list all server uptimes
 list-uptimes-steps: steps
 
