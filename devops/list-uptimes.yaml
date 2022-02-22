@@ -1,0 +1,16 @@
+---
+- name: show stats of running nodes
+  hosts: fabchain
+  remote_user: app
+  tasks:
+    - name: Read uptime
+      command: uptime
+      register: uptime
+    - name: Read memory usage
+      shell: free | awk '/Mem:/ { printf "%u",100 - ($7 * 100) / $2 }'
+      register: memory
+    - name: Show stats
+      debug:
+        msg:
+          - "Uptime: {{  uptime.stdout }}"
+          - "Memory usage: {{ memory.stdout }}%"
