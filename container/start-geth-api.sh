@@ -18,6 +18,7 @@ if [ -r ${data}/pre-execution-script.sh ]; then
 fi
 
 geth --networkid $NETWORK_ID \
+     --verbosity 2 \
      --ipcpath geth.ipc \
      --port $P2P_PORT \
      --nat extip:${pubip} \
