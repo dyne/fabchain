@@ -1,6 +1,6 @@
 ---
 - name: show stats of running nodes
-  hosts: fabchain
+  hosts: all
   remote_user: app
   tasks:
     - name: Read uptime

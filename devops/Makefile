@@ -28,22 +28,29 @@ upgrade: inventory ## upgrade all applications to latest container tag
 	$(call ANSIPLAY, upgrade.yaml)
 	make start
 
-install-explorer: inventory ## install the block explorer on the api node
-	$(call ANSIPLAY, install-explorer.yaml)
-
-signers-exec: IPS := $(shell hcloud server list -o noheader -o columns=ipv4 | xargs)
-signers-exec: CMD ?= eth.getBalance(eth.accounts[0])
-signers-exec: ## execute a geth console command on all signers
-	for i in ${IPS}; do ssh -i ./sshkey \
+remote-exec: ON ?= sign
+remote-exec: IPS := $(shell hcloud server list -o noheader -o columns=name,ipv4 | awk '/${ON}/{print $$2}' | xargs)
+remote-exec: CMD ?= eth.getBalance(eth.accounts[0])
+remote-exec: ## execute a geth console command on all signers
+	@for i in ${IPS}; do echo -n >&2 "\nHost: $$i" ; ssh -i ./sshkey \
 	  -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes \
-	  "app@$$i" "cd dyneth && make command CMD='${CMD}'" ;\
+	  "app@$$i" "cd dyneth && make command CMD='${CMD}' 2>/dev/null" ;\
+	done
+
+remote-shell: ON ?= sign
+remote-shell: IPS := $(shell hcloud server list -o noheader -o columns=name,ipv4 | awk '/${ON}/{print $$2}' | xargs)
+remote-shell: CMD ?= top -b -d 5 -n 3 | head -n 15
+remote-shell: ## execute a shell command on all signers
+	@for i in ${IPS}; do echo >&2 "\nHost: $$i" ; ssh -i ./sshkey \
+	  -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes \
+	  "app@$$i" "cd dyneth && TERM=linux ${CMD}" ;\
 	done
 
 ##@ Genesis management
 
+list-addresses: CMD := eth.accounts[0]
 list-addresses: inventory ## list all app public addressess
-	$(call ANSIPLAY, list-addresses.yaml)
-list-addresses-steps: steps
+	@make -s remote-exec CMD="eth.accounts[0]" ON=sign
 
 init-genesis: inventory ## initialize genesis on all nodes
 	$(if $(wildcard genesis.json),,$(error Genesis file not found))
@@ -89,12 +96,17 @@ inventory: ## create an ansible inventory (used internally)
 install: ssh-keygen inventory
 install: ## install all servers and create new accounts
 	$(call ANSIPLAY, install.yaml)
-
 install-steps: steps
 
+install-explorer: inventory ## install the block explorer on the api node
+	$(call ANSIPLAY, install-explorer.yaml)
+
+server-list: ## print a list of servers and their status
+	@hcloud server list -o columns=name,status,ipv4,datacenter
+
 ssh: HOST ?= sign-1
-ssh:
-	ssh $(shell hcloud server list -o noheader -o columns=name,ipv4 | awk '/${HOST}/{print $$2}') \
+ssh: ## open an ssh session on HOST=name (see make server-list)
+	@ssh $(shell hcloud server list -o noheader -o columns=name,ipv4 | awk '/${HOST}/{print $$2}') \
 	 -l root -i ./sshkey -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes 
 
 server-cmd: CMD ?= describe
