@@ -10,6 +10,7 @@ fi
 
 
 geth --networkid ${NETWORK_ID} \
+     --verbosity 2 \
      --ipcpath geth.ipc \
      --nat extip:${pubip} \
      --port ${P2P_PORT} \
