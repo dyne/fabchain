@@ -1,5 +1,5 @@
 ---
-- name: Dyneth run all signers
+- name: START ALL APIs
   hosts: api
   remote_user: app
   vars:

@@ -1,6 +1,6 @@
 ---
-- name: stop all nodes 
-  hosts: fabchain
+- name: STOP ALL NODES
+  hosts: all
   remote_user: app
   vars:
     ansible_remote_tmp: /tmp

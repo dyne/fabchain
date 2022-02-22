@@ -158,14 +158,12 @@ and run `make genesis-create` and the genesis will be found in
 `data/genesis.json` ready for your local node.
 
 Then if using the [devops](devops) tools to create the nodes one can
-copy genesis.json inside that directory and run `make list-bootnodes`
+copy genesis.json inside that directory and run `make init-bootnodes`
 to make sure its copied on each node and the bootnode ENR address
 returned.
 
-The ENR addressess will be needed to compile the `bootnodes.csv`
-
-Both `genesis.json` and `bootnodes.csv` will need to be uploaded on
-each node.
+Both `genesis.json` and `bootnodes.csv` need to be uploaded on
+each new node for the network to function.
 
 **[🔝 back to top](#toc)**
 

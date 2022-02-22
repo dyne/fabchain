@@ -14,16 +14,17 @@
     shell: test -r ~/dyneth/data/geth/chaindata/CURRENT && echo "GenesisInitialized" || echo
     register: genesis_initialized
     changed_when: false
+
   - name: Initialize data/genesis.json
     command: make genesis-init
     args:
       chdir: ~/dyneth
     when: genesis_initialized.stdout != "GenesisInitialized"
 
-  - local_action: command /bin/rm -f enr*
-
   - name: delete bootnodes.csv
-    command: /bin/rm -f ~/dyneth/data/bootnodes.csv
+    file:
+      path: ~/dyneth/data/bootnodes.csv
+      state: absent
 
   - name: Stop geth
     command: make stop
@@ -31,13 +32,21 @@
     args:
       chdir: ~/dyneth
 
+  - name: touch empty bootnodes.csv
+    file:
+      path: ~/dyneth/data/bootnodes.csv
+      state: touch
+
   - name: Run signer in background
     command: make run-signer
     args:
       chdir: ~/dyneth
 
+  - name: clean local enr files
+    local_action: command /bin/rm -f enr*
+
   - pause:
-      seconds: 5
+      seconds: 2
 
   - name: Generate enr
     command: make enr
@@ -48,16 +57,3 @@
   - debug: var=enr.stdout
 
   - local_action: copy content="{{ enr.stdout_lines.0 }}" dest="enr-{{ inventory_hostname }}"
-
-  - local_action: command bash join_enr.sh
-
-  - name: Stop geth
-    command: make stop
-    args:
-      chdir: ~/dyneth
-
-  - name: copy bootnodes.csv
-    copy:
-      src: bootnodes.csv
-      dest: ~/dyneth/data
-
