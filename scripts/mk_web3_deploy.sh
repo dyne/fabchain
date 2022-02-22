@@ -43,5 +43,5 @@ signed = account.signTransaction(construct_txn)
 
 txid=w3.eth.sendRawTransaction(signed.rawTransaction).hex()
 
-print("Transaction id: {}".format(txid))
+print("{}".format(txid))
 EOF
