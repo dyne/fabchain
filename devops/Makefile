@@ -1,4 +1,4 @@
-include config.mk
+R ?= $(shell pwd)
 
 ##@ General
 help: ## Display this help.
@@ -6,10 +6,13 @@ help: ## Display this help.
 
 ANSIPLAY = ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook --inventory hosts.toml --ssh-common-args '-o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes' --private-key ./sshkey $(1)
 
+hcloud-token:
+	include config.mk
+
 ssh-keygen: ## generate a dedicated ssh keypair here
-	$(if $(wildcard ${sshkey}),, \
+	$(if $(wildcard ./sshkey),, \
 		$(info Generating ssh keypair) \
-		ssh-keygen -t ed25519 -f ${sshkey} -q -N '')
+		ssh-keygen -t ed25519 -f ./sshkey -q -N '')
 
 steps:
 	@cat $(subst -steps,,${MAKECMDGOALS}).yaml | grep '\- name'
@@ -23,10 +26,13 @@ start: ## start all applications
 stop: ## stop all applications
 	$(call ANSIPLAY, stop.yaml)
 
-upgrade: inventory # upgrade all applications to latest container tag
+upgrade: inventory ## upgrade all applications to latest container tag
 	make stop
 	$(call ANSIPLAY, upgrade.yaml)
 	make start
+
+install-explorer: inventory ## install the block explorer on the api node
+	$(call ANSIPLAY, install-explorer.yaml)
 
 ##@ Genesis management
 
@@ -53,10 +59,9 @@ upload-bootnodes: ## upload bootnodes.csv (used by init-bootnodes)
 ##@ Server management
 
 list-datacenters:
-	@curl -sLH "Authorization: Bearer ${API_TOKEN}" \
-	'https://api.hetzner.cloud/v1/datacenters' \
-	| awk '/name.*-dc/{ print $$2 }' | sed 's/,//' | xargs
-	@echo "fill DATACENTERS in config.mk"
+	@echo
+	@hcloud datacenter list | awk '/NAME/{next} {print $$2}' | xargs
+	@echo; echo "fill DATACENTERS in Makefile accordingly."
 
 server-create: DATACENTERS := "nbg1-dc3 hel1-dc2 fsn1-dc14"
 server-create: ## create all servers on hcloud, 3 signers and 1 api
@@ -77,9 +82,9 @@ install:
 
 install-steps: steps
 
-ssh: NODE ?= sign-1
+ssh: HOST ?= sign-1
 ssh:
-	ssh $(shell hcloud server list -o noheader -o columns=name,ipv4 | awk '/${NODE}/{print $$2}') \
+	ssh $(shell hcloud server list -o noheader -o columns=name,ipv4 | awk '/${HOST}/{print $$2}') \
 	 -l root -i ./sshkey -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes 
 
 server-cmd: CMD ?= describe

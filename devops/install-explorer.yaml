@@ -1,6 +1,6 @@
 ---
 - name: install the block explorer
-  hosts: fabchainexplorer
+  hosts: api
   remote_user: app
   tasks:
     - name: Install nvm
@@ -17,7 +17,8 @@
       git: repo=https://github.com/etherparty/explorer dest=~/explorer force=true
 
     - name: start the block explorer
-      shell: /bin/bash -c "source ~/.nvm/nvm.sh && tmux new -d -s explorer 'sed -i '\''s/localhost/{{ inventory_hostname }}/g'\'' package.json && sed -i '\''s/localhost/{{ inventory_hostname }}/g'\'' app/app.js  && npm start'"
+      shell: >
+        /bin/bash -c "source ~/.nvm/nvm.sh && tmux new -d -s explorer 'sed -i '\''s/localhost/{{ inventory_hostname }}/g'\'' package.json && sed -i '\''s/localhost/{{ inventory_hostname }}/g'\'' app/app.js  && npm start'"
       args:
         chdir: ~/explorer
 

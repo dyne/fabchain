@@ -1,0 +1,10 @@
+---
+- name: UPGRADE ALL SERVERS
+  hosts: all
+  remote_user: app
+  tasks:
+
+  - name: pull
+    shell: git checkout . && git pull --rebase && make pull
+    args:
+      chdir: ~/dyneth
