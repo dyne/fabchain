@@ -24,9 +24,6 @@ if [ -r "$bootnodes_csv" ]; then
 	if ! [ "$bootnodes_enr" == "" ]; then bootnodes_enr="${bootnodes_enr},"; fi
 	bootnodes_enr="${bootnodes_enr}$(echo $i | cut -d' ' -f2)"
     done < $bootnodes_csv
-else
-    info "ERROR: missing network bootnodes in data/bootnodes.csv"
-    exit 1
 fi
 info "Bootnodes: $bootnodes_enr"
 
