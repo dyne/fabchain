@@ -5,5 +5,5 @@
 
 sk=`secret_key`
 echo && echo "Your secret key:"
-blink ${sk} && echo
+echo ${sk} && echo
 

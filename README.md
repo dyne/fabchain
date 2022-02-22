@@ -150,17 +150,30 @@ instance the `share` of coins assigned to each signer, which is in
 fact the total amount of coins pre-mined.
 
 Then install all the new signer nodes, create their accounts and note
-down their addressess, using our [devops](devops) setup that is made
-with `make list-addresses`.
+down their addressess, using our [devops](devops) setup that is simply
+made with:
+
+```
+cd devops
+make server-create    # creates 3 signers and 1 api server
+make install          # instals all servers with dyneth
+make list-addressess
+cd -
+```
 
 Then fill the signer addressess in the `scripts/params-genesis.json`
 and run `make genesis-create` and the genesis will be found in
 `data/genesis.json` ready for your local node.
 
-Then if using the [devops](devops) tools to create the nodes one can
-copy genesis.json inside that directory and run `make init-bootnodes`
-to make sure its copied on each node and the bootnode ENR address
-returned.
+Then if using the [devops](devops) tools to create the nodes:
+
+```
+cp data/genesis.json devops/
+cd devops
+make init-genesis
+make init-bootnodes
+cd -
+```
 
 Both `genesis.json` and `bootnodes.csv` need to be uploaded on
 each new node for the network to function.
