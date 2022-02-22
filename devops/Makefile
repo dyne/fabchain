@@ -5,26 +5,55 @@ help: ## Display this help.
 
 steps:
 	@cat $(subst -steps,,${MAKECMDGOALS}).yaml | grep '\- name'
+
+play: ARGS := $(if $(wildcard hosts.toml),--inventory hosts.toml)
 play:
-	ansible-playbook ${MAKECMDGOALS}.yaml
+	ansible-playbook ${MAKECMDGOALS}.yaml ${ARGS}
 
-install: play ## install all nodes with dyneth and its dependencies
-install-steps: steps
+##@ Application management
 
-start: play ## start all nodes (ROLE=sign by default)
+install-sign: inventory play ## install all sign nodes
+install-sign-steps: steps
+
+install-api: inventory play ## install all api nodes
+install-api-steps: steps
+
+start: inventory play ## start all applications (ROLE=sign by default)
 start-steps: steps
 
-stop: play ## stop all nodes
+stop: play ## stop all applications
 stop-steps: steps
 
-upgrade-offline: play ## update all nodes while off-line (no restart)
+upgrade-offline: play ## update all app containers while off-line (no restart)
 upgrade-offline-steps: steps
 
-upgrade-restart: play ## update all nodes while on-line (stop-update-start)
+upgrade-restart: play ## update all app containers while on-line (stop-update-start)
 upgrade-restart-steps: steps
 
-list-addresses: play ## list all nodes public addressess
+list-addresses: play ## list all app public addressess
 list-addresses-steps: steps
 
-list-bootnodes: play ## list all nodes ENR addresses and write data/bootnodes.csv
+list-bootnodes: play ## list all app ENR addresses and write data/bootnodes.csv
 list-bootnodes-steps: steps
+
+##@ Server management
+inventory:
+inventory:
+	@echo "[sign]" > hosts.toml
+	@hcloud server list -o noheader -o columns=name,ipv4 \
+	| awk '/sign/{print $$2}' >> hosts.toml
+	@echo "[api]" >> hosts.toml
+	@hcloud server list -o noheader -o columns=name,ipv4 \
+	| awk '/api/{print $$2}' >> hosts.toml
+	@cat hosts.toml
+
+hcloud-create: ## create all servers on hcloud, 3 signers and 1 api
+	./hcloud-create-3-1.sh
+
+hcloud-servers: CMD ?= describe
+hcloud-servers:
+	./hcloud-server-foreach.sh ${CMD}
+
+list-uptimes: play ## list all server uptimes
+list-uptimes-steps: steps
+
