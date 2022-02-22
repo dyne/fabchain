@@ -108,7 +108,7 @@ console: ## open the geth console inside running server
 command: CMD ?= eth.getBalance(eth.accounts[0])
 command: init running
 	$(info Executing command: ${CMD})
-	docker exec -it --user geth ${container} geth attach --exec "${CMD}"
+	docker exec --user geth ${container} geth attach --exec "${CMD}"
 
 stop:	init running upnp-close
 stop: ## stop running server

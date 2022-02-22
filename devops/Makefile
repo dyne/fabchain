@@ -32,11 +32,12 @@ install-explorer: inventory ## install the block explorer on the api node
 	$(call ANSIPLAY, install-explorer.yaml)
 
 signers-exec: IPS := $(shell hcloud server list -o noheader -o columns=ipv4 | xargs)
-signers-exec: CMD := "eth.getBalance(eth.accounts[0])"
+signers-exec: CMD ?= eth.getBalance(eth.accounts[0])
 signers-exec: ## execute a geth console command on all signers
 	for i in ${IPS}; do ssh -i ./sshkey \
 	  -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes \
-	  "app@$$i" -c "docker exec -it --user geth ${container} geth attach --exec ${CMD}" ; \
+	  "app@$$i" "cd dyneth && make command CMD='${CMD}'" ;\
+	done
 
 ##@ Genesis management
 
