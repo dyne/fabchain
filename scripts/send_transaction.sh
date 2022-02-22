@@ -10,7 +10,7 @@ echo >&2 "API Address to fund: $destaddr"
 
 eth_amount=$2
 wei_amount=`echo "$eth_amount * 10^18" | bc -l`
-echo >&2 "Amount to fund: $wei_amount"
+echo >&2 "Amount to fund: $wei_amount wei"
 
 make command \
-     CMD="eth.sendTransaction({from: eth.accounts[0], to: \"${destaddr}\", value: \"${wei_amount}\"})"
+     CMD="eth.sendTransaction({from: eth.accounts[0], to: '${destaddr}', value: '${wei_amount}'})"
