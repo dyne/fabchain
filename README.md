@@ -131,6 +131,44 @@ API documentation is maintained by the ethereum project:
 **[🔝 back to top](#toc)**
 
 
+***
+## 🌞 GENESIS
+
+To bootstrap a new blokchain one needs to create a genesis, which
+needs a new chainID which is an integer, easy to find using a string
+for instance `fabt` we do:
+```
+echo "print(BIG.new(O.from_string('fabt')):decimal())" | zenroom
+```
+And find `1717658228` as our 4 letter chain ID.
+
+Then copy
+[scripts/params-genesis.json.example](scripts/params-genesis.json.example)
+to a new file `scripts/params-genesis.json` and configure it with the
+chain IDs, the current epoch and other base configurations as for
+instance the `share` of coins assigned to each signer, which is in
+fact the total amount of coins pre-mined.
+
+Then install all the new signer nodes, create their accounts and note
+down their addressess, using our [devops](devops) setup that is made
+with `make list-addresses`.
+
+Then fill the signer addressess in the `scripts/params-genesis.json`
+and run `make genesis-create` and the genesis will be found in
+`data/genesis.json` ready for your local node.
+
+Then if using the [devops](devops) tools to create the nodes one can
+copy genesis.json inside that directory and run `make list-bootnodes`
+to make sure its copied on each node and the bootnode ENR address
+returned.
+
+The ENR addressess will be needed to compile the `bootnodes.csv`
+
+Both `genesis.json` and `bootnodes.csv` will need to be uploaded on
+each node.
+
+**[🔝 back to top](#toc)**
+
 
 ***
 ## 😍 Acknowledgements

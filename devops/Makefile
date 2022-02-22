@@ -14,21 +14,33 @@ steps:
 
 play: ARGS := $(if $(wildcard hosts.toml),--inventory hosts.toml)
 play:
-	ansible-playbook ${MAKECMDGOALS}.yaml ${ARGS}
+	ansible-playbook ${MAKECMDGOALS}.yaml ${ARGS} \
+	 --ssh-common-args '-o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes' \
+	 --private-key ./sshkey
 
 ##@ Application management
 
-install-sign: inventory play ## install all sign nodes
-install-sign-steps: steps
+install: inventory ## install all sign nodes
+install:
+	ANSIBLE_HOST_KEY_CHECKING=False \
+	ansible-playbook --inventory hosts.toml \
+	--ssh-common-args '-o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes' \
+	--private-key ./sshkey install.yaml
 
-install-api: inventory play ## install all api nodes
-install-api-steps: steps
+install-steps: steps
 
-start: inventory play ## start all applications (ROLE=sign by default)
-start-steps: steps
+start: inventory ## start all applications (ROLE=sign by default)
+start:
+	ANSIBLE_HOST_KEY_CHECKING=False \
+	ansible-playbook start-signers.yaml --inventory hosts.toml \
+	--ssh-common-args '-o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes' \
+	--private-key ./sshkey
+	ANSIBLE_HOST_KEY_CHECKING=False \
+	ansible-playbook start-apis.yaml --inventory hosts.toml \
+	--ssh-common-args '-o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes' \
+	--private-key ./sshkey
 
 stop: play ## stop all applications
-stop-steps: steps
 
 upgrade-offline: play ## update all app containers while off-line (no restart)
 upgrade-offline-steps: steps
@@ -36,13 +48,20 @@ upgrade-offline-steps: steps
 upgrade-restart: play ## update all app containers while on-line (stop-update-start)
 upgrade-restart-steps: steps
 
+##@ Genesis management
+
 list-addresses: play ## list all app public addressess
 list-addresses-steps: steps
 
-list-bootnodes: play ## list all app ENR addresses and write data/bootnodes.csv
-list-bootnodes-steps: steps
+init-bootnodes: play ## list all app ENR bootnode addresses
+init-bootnodes-steps: steps
 
 ##@ Server management
+
+ssh: NODE ?= sign-1
+ssh:
+	ssh $(shell hcloud server list -o noheader -o columns=name,ipv4 | awk '/${NODE}/{print $$2}') \
+	 -l root -i ./sshkey -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes 
 
 inventory:
 inventory:
@@ -64,7 +83,7 @@ server-create: ## create all servers on hcloud, 3 signers and 1 api
 	bash ./hcloud-create-3-1.sh ${DATACENTERS}
 
 server-cmd: CMD ?= describe
-server-cmd:
+server-cmd: ## execute an hcloud server command on all nodes
 	./hcloud-server-foreach.sh ${CMD}
 
 list-uptimes: inventory play ## list all server uptimes

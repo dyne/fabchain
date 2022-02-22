@@ -1,6 +1,6 @@
 ---
 - name: List all public keys of nodes
-  hosts: fabchain
+  hosts: sign
   remote_user: app
   vars:
     ansible_remote_tmp: /tmp

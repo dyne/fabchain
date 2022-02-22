@@ -1,6 +1,6 @@
 ---
 - name: Create the list of bootnodes in enr format
-  hosts: fabchain
+  hosts: sign
   remote_user: app
   vars:
     ansible_remote_tmp: /tmp
@@ -47,7 +47,7 @@
 
   - debug: var=enr.stdout
 
-  - local_action: copy content={{ enr.stdout_lines.0 }} dest=enr-{{ inventory_hostname }}
+  - local_action: copy content="{{ enr.stdout_lines.0 }}" dest="enr-{{ inventory_hostname }}"
 
   - local_action: command bash join_enr.sh
 

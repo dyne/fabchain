@@ -1,6 +1,6 @@
 ---
 - name: Dyneth node installation
-  hosts: fabchain
+  hosts: all
   remote_user: root
   vars:
     geth_pass: "{{ lookup('password','/tmp/passfile length=64 chars=ascii_letters,digits') }}"

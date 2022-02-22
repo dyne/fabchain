@@ -1,0 +1,10 @@
+---
+- name: Dyneth run all signers
+  hosts: api
+  remote_user: app
+  vars:
+    ansible_remote_tmp: /tmp
+  tasks:
+  - command: make run
+    args:
+      chdir: ~/dyneth
