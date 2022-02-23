@@ -14,6 +14,11 @@
   - name: Setup UFW firewall
     community.general.ufw:
       state: reset
+  - name: Allow access from dyneth network
+    community.general.ufw:
+      rule: allow
+      src: "{{ item }}"
+    loop: "{{ servers }}"
   - name: limit SSH connections
     community.general.ufw:
       rule: limit
@@ -31,11 +36,6 @@
       port: "{{ item }}"
       proto: udp
     loop: "{{ sign_ports }}"
-  - name: Allow access from dyneth network
-    community.general.ufw:
-      rule: allow
-      src: "{{ item }}"
-    loop: "{{ servers }}"
   - name: Setup UFW firewall
     community.general.ufw:
       state: enabled
