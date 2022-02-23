@@ -1,10 +1,10 @@
 ---
-- name: Dyneth node installation
-  hosts: api
+- name: INSTALL FIREWALL ON SIGNERS
+  hosts: sign
   remote_user: root
   vars:
-    api_ports: "{{ lookup('env','API_PORTS') }}"
-    signers: "{{ lookup('env','SIGNERS') }}"
+    servers: "{{ lookup('env','SERVERS') }}"
+    sign_ports: "{{ lookup('env','SIGN_PORTS') }}"
   tasks:
   - name: install package dependencies
     ansible.builtin.package:
@@ -19,17 +19,23 @@
       rule: limit
       port: ssh
       proto: tcp
-  - name: Allow all access from signers
-    community.general.ufw:
-      rule: allow
-      src: "{{ item }}"
-    loop: "{{ signers }}"
-  - name: limit tcp connections
+  - name: limit TCP connections
     community.general.ufw:
       rule: limit
       port: "{{ item }}"
       proto: tcp
-    loop: "{{ api_ports }}"
+    loop: "{{ sign_ports }}"
+  - name: limit UDP connections
+    community.general.ufw:
+      rule: limit
+      port: "{{ item }}"
+      proto: udp
+    loop: "{{ sign_ports }}"
+  - name: Allow access from dyneth network
+    community.general.ufw:
+      rule: allow
+      src: "{{ item }}"
+    loop: "{{ servers }}"
   - name: Setup UFW firewall
     community.general.ufw:
       state: enabled
