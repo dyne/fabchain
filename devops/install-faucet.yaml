@@ -1,0 +1,71 @@
+---
+- name: install the block explorer
+  hosts: api
+  remote_user: root
+  become_user: app
+  become_method: su
+  vars:
+    contract: "{{ lookup('env','CONTRACT') or '0x14aD0baF28b67ae3905CFe8E2e5eA296278Ec4ab'}}"
+  tasks:
+  - name: install package dependencies
+    ansible.builtin.package:
+      name:
+       - python3
+       - python3-pip
+       - python3-dev
+       - build-essential
+      state: latest
+
+  - name: read contract address
+    shell: /bin/bash -c "cd /home/app/dyneth && make backup-secret | awk '{ print $2 }'"
+    register: sk
+
+  - debug: 
+      var: "{{ '{{ sk.stdout_lines | last }}' }}"
+
+#- name: deploy faucet contract 
+#shell: /bin/bash -c "cd dyneth && SOL=contracts/Faucet.sol GAS_LIMIT=1000000 GAS_PRICE=10000000000 PARAMS=\\\"\\\" make contract-deploy "
+#register: txid
+
+#- debug:
+#var: "{{ '{{ txid.stdout_lines | last }}' }}"
+
+#  - pause:
+# seconds: 10
+
+#- name: read contract address
+#shell: cd dyneth && TXID={{ txid.stdout_lines | last }} make contract-info | jq .
+#register: contract
+
+#- debug: var=contract.stdout
+
+  - name: generate .env
+    copy:
+      src: ../web/faucet/.env.example
+      dest: /home/app/dyneth/web/faucet/.env
+
+  - name: add private key to .env
+    lineinfile:
+      path: /home/app/dyneth/web/faucet/.env
+      line: "SK={{ sk.stdout_lines | last }}"
+
+  - name: add contract address to .env
+    lineinfile:
+      path: /home/app/dyneth/web/faucet/.env
+      line: "CONTRACT={{ contract }}"
+
+  - name: install pipenv
+    shell: /bin/bash -c "pip3 install pipenv"
+
+  - name: install environment
+    shell: /bin/bash -c "cd /home/app/dyneth/web/faucet && pipenv lock"
+    become: true
+
+  - name: install environment
+    shell: /bin/bash -c "cd /home/app/dyneth/web/faucet && pipenv sync"
+    become: true
+
+  - name: start flask app
+    shell: /bin/bash -c "cd /home/app/dyneth/web/faucet && tmux new -d -s faucet \"FLASK_APP=faucet pipenv run flask run --host 0.0.0.0\""
+    become: true
+

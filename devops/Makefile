@@ -124,7 +124,7 @@ install-steps: steps
 
 install-firewall: SIGNERS := [ $(shell hcloud server list -o columns=name,ipv4 | awk '/sign/{printf "'"'"'%s'"'"',",$$2} END{printf"\n"}') ]
 install-firewall: SERVERS := [ $(shell hcloud server list -o noheader -o columns=ipv4 | awk '{printf "'"'"'%s'"'"',",$$1} END{printf"\n"}') ]
-install-firewall: API_PORTS := [ '${API_PORT}', '8000' ]
+install-firewall: API_PORTS := [ '${API_PORT}', '8000', '5000' ]
 install-firewall: SIGN_PORTS := [ '${P2P_PORT}' ]
 install-firewall: inventory
 	SIGNERS="${SIGNERS}" API_PORTS="${API_PORTS}" $(call ANSIPLAY, install-firewall.yaml)
@@ -135,6 +135,9 @@ create-accounts: inventory ## create accounts on all servers
 
 install-explorer: inventory ## install the block explorer on the api node
 	$(call ANSIPLAY, install-explorer.yaml)
+
+install-faucet: inventory ## install the block explorer on the api node
+	$(call ANSIPLAY, install-faucet.yaml)
 
 server-list: ## print a list of servers and their status
 	@hcloud server list -o columns=name,status,ipv4,datacenter
