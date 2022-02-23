@@ -52,7 +52,7 @@
   - name: add contract address to .env
     lineinfile:
       path: /home/app/dyneth/web/faucet/.env
-      line: "CONTRACT={{ contract }}"
+      line: "CONTRACT_ADDRESS={{ contract }}"
 
   - name: install pipenv
     shell: /bin/bash -c "pip3 install pipenv"
