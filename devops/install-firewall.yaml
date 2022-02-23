@@ -1,0 +1,45 @@
+---
+- name: Dyneth node installation
+  hosts: api
+  remote_user: root
+  vars:
+    api_ports: "{{ lookup('env','API_PORTS') }}"
+    signers: "{{ lookup('env','SIGNERS') }}"
+  tasks:
+  - name: install package dependencies
+    ansible.builtin.package:
+      name:
+        - ufw
+      state: latest
+  - name: Setup UFW firewall
+    community.general.ufw:
+      state: enabled
+      policy: deny
+  - name: Allow all access from signers
+    community.general.ufw:
+      rule: allow
+      src: "{{ item }}"
+    loop: "{{ signers }}"
+  - name: allow tcp connections
+    community.general.ufw:
+      rule: allow
+      port: "{{ item }}"
+      proto: tcp
+    loop: "{{ api_ports }}"
+  - name: limit tcp connections
+    community.general.ufw:
+      rule: limit
+      port: "{{ item }}"
+      proto: tcp
+    loop: "{{ api_ports }}"
+  - name: allow SSH connections
+    community.general.ufw:
+      rule: "{{ item }}"
+      port: ssh
+      proto: tcp
+    loop: [ allow, limit ]
+  # - name: limit SSH connections
+  #   community.general.ufw:
+  #     rule: limit
+  #     port: ssh
+  #     proto: tcp

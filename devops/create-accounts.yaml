@@ -1,0 +1,27 @@
+---
+- name: CREATE DYNETH ACCOUNTS
+  hosts: all
+  remote_user: app
+  vars:
+    geth_pass: "{{ lookup('password','/tmp/passfile length=64 chars=ascii_letters,digits') }}"
+    dyneth_repo: "{{ lookup('env','DYNETH_REPO') or 'https://github.com/dyne/dyneth'}}"
+    ansible_remote_tmp: /tmp
+  tasks:
+  - name: Check dyneth cloned
+    shell: test -d ~/dyneth && echo "DynethCloned" || echo
+    register: dyneth_cloned
+    changed_when: false
+
+  - name: Clone dyneth
+    shell: git clone {{ dyneth_repo }} dyneth \
+    when: dyneth_cloned.stdout != "DynethCloned"
+
+  - name: Check dyneth account
+    shell: test -d /home/app/dyneth/data/keystore && echo "DynethAccount" || echo
+    register: dyneth_account
+    changed_when: false
+
+  - name: Create account
+    shell: cd dyneth && make account PASS={{ geth_pass }}
+    register: geth_account_address
+    when: dyneth_account.stdout != "DynethAccount"

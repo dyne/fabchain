@@ -1,0 +1,22 @@
+---
+- name: Initialize genesis on all nodes
+  hosts: all
+  remote_user: app
+  vars:
+    ansible_remote_tmp: /tmp
+  tasks:
+  - name: copy genesis file on machine
+    copy:
+      src: genesis.json
+      dest: ~/dyneth/data
+
+  - name: Check genesis initialization
+    shell: test -r ~/dyneth/data/geth/chaindata/CURRENT && echo "GenesisInitialized" || echo
+    register: genesis_initialized
+    changed_when: false
+
+  - name: Initialize data/genesis.json
+    command: make genesis-init
+    args:
+      chdir: ~/dyneth
+    when: genesis_initialized.stdout != "GenesisInitialized"
