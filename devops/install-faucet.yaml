@@ -6,6 +6,7 @@
   become_method: su
   vars:
     contract: "{{ lookup('env','CONTRACT') or '0x14aD0baF28b67ae3905CFe8E2e5eA296278Ec4ab'}}"
+    chain_id: "{{ lookup('env','CHAIN_ID') or '1717658228'}}"
   tasks:
   - name: install package dependencies
     ansible.builtin.package:
@@ -53,6 +54,11 @@
     lineinfile:
       path: /home/app/dyneth/web/faucet/.env
       line: "CONTRACT_ADDRESS={{ contract }}"
+
+  - name: add contract address to .env
+    lineinfile:
+      path: /home/app/dyneth/web/faucet/.env
+      line: "CHAIN_ID={{ chain_id }}"
 
   - name: install pipenv
     shell: /bin/bash -c "pip3 install pipenv"
