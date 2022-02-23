@@ -14,16 +14,16 @@
   - name: Setup UFW firewall
     community.general.ufw:
       state: reset
-  - name: limit SSH connections
-    community.general.ufw:
-      rule: limit
-      port: ssh
-      proto: tcp
   - name: Allow all access from signers
     community.general.ufw:
       rule: allow
       src: "{{ item }}"
     loop: "{{ signers }}"
+  - name: limit SSH connections
+    community.general.ufw:
+      rule: limit
+      port: ssh
+      proto: tcp
   - name: limit tcp connections
     community.general.ufw:
       rule: limit
