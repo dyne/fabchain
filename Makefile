@@ -224,7 +224,7 @@ debug:	init stopped
 debug: ## run a shell in a new interactive container (no daemons)
 	@echo "P2P networking through port ${P2P_PORT}"
 	@echo "HTTP API available at port ${API_PORT}"
-	@echo "Data storage in ~/.dyneth" && echo
+	@echo "Data storage in ~/.ethereum" && echo
 	@echo "Debugging docker container:"
 	docker run -it --user root -p ${P2P_PORT}:${P2P_PORT}/tcp \
 	 -p ${P2P_PORT}:${P2P_PORT}/udp -p ${API_PORT}:${API_PORT} \

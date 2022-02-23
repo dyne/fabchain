@@ -1,6 +1,6 @@
-# DYNETH configuration
+# FABCHAIN backend configuration
 
-VERSION := 0.6.0
+VERSION := 0.7.0
 DOCKER := dyne/dyneth
 P2P_PORT := 30303
 API_PORT := 8545
