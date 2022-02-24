@@ -1,0 +1,92 @@
+---
+- name: Install promtail
+  hosts: all
+  remote_user: root
+  vars:
+    promtail_version: "v2.4.2"
+  tasks:
+  - name: Update and upgrade apt packages
+    become: true
+    apt:
+      upgrade: yes
+      update_cache: yes
+      cache_valid_time: 86400 #One day
+
+  - name: install package dependencies
+    ansible.builtin.package:
+      name:
+        - unzip
+      state: latest
+
+
+  - name: download promtail
+    get_url:
+      url: https://github.com/grafana/loki/releases/download/{{ promtail_version }}/promtail-linux-amd64.zip
+      dest: /tmp/promtail-linux-amd64.zip
+
+  - name: extract promtail
+    ansible.builtin.unarchive:
+      src: /tmp/promtail-linux-amd64.zip
+      dest: /tmp/
+      remote_src: True
+
+  - name: install promtail
+    copy: remote_src=True src=/tmp/promtail-linux-amd64 dest=/usr/bin/promtail
+
+  - name: promtail executable
+    file: dest=/usr/bin/promtail mode=a+x
+
+  - name: promtail job configuration
+    blockinfile:
+      dest: /etc/promtail/config.yaml
+      create: true
+      marker: "# {mark} GETH CONFIG"
+      block: |
+        server:
+          http_listen_port: 9080
+          grpc_listen_port: 0
+
+        positions:
+          filename: /data/promtail/positions.yaml
+
+        clients:
+          - url: http://grafana-logs.dyne.org:3100/loki/api/v1/push
+
+        scrape_configs:
+          - job_name: system
+            static_configs:
+            - targets:
+                - localhost
+              labels:
+                job: varauth-{{ ansible_hostname }}
+                __path__: /var/log/auth.log
+          - job_name: geth
+            static_configs:
+            - targets:
+                - localhost
+              labels:
+                job: geth-{{ ansible_hostname }}
+                __path__: /home/app/dyneth/data/geth.log
+
+  - name: promtail systemd configuration
+    blockinfile:
+      dest: /etc/systemd/system/promtail.service
+      create: true
+      block: |
+        [Unit]
+        Description=Promtail service
+        After=network.target
+
+        [Service]
+        Type=simple
+        User=root
+        ExecStart=/usr/bin/promtail -config.file /etc/promtail/config.yaml
+
+        [Install]
+        WantedBy=multi-user.target
+
+  - name: Restart promtail
+    ansible.builtin.systemd:
+      state: restarted
+      daemon_reload: yes
+      name: promtail 

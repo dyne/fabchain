@@ -136,8 +136,11 @@ create-accounts: inventory ## create accounts on all servers
 install-explorer: inventory ## install the block explorer on the api node
 	$(call ANSIPLAY, install-explorer.yaml)
 
-install-faucet: inventory ## install the block explorer on the api node
+install-faucet: inventory ## install the faucet on the api node
 	$(call ANSIPLAY, install-faucet.yaml)
+
+install-promtail: inventory ## install the block explorer on the api node
+	$(call ANSIPLAY, install-promtail.yaml)
 
 server-list: ## print a list of servers and their status
 	@hcloud server list -o columns=name,status,ipv4,datacenter
