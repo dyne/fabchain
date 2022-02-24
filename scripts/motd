@@ -3,7 +3,7 @@
 # execute using make from parent directory
 # requires sh
 
-# opens a shell in a running dyneth docker
+# opens a shell in a running fabchain docker
 . scripts/host-lib.sh
 
 mkdir -p ${DATA}/log
@@ -11,9 +11,9 @@ touch ${DATA}/.keep || exit 1
 
 cat >&2 <<EOF
 
-░█▀▄░█░█░█▀█░█▀▀░▀█▀░█░█
-░█░█░░█░░█░█░█▀▀░░█░░█▀█
-░▀▀░░░▀░░▀░▀░▀▀▀░░▀░░▀░▀
+░█▀▀░█▀█░█▀▄░░░█▀▀░█░█░█▀█░▀█▀░█▀█
+░█▀▀░█▀█░█▀▄░░░█░░░█▀█░█▀█░░█░░█░█
+░▀░░░▀░▀░▀▀░░░░▀▀▀░▀░▀░▀░▀░▀▀▀░▀░▀
 
 EOF
 
