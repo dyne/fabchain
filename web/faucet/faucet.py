@@ -17,8 +17,9 @@ FAUCET_ABI = json.loads(environ.get('FAUCET_ABI'))
 CHAIN_ID = int(environ.get('CHAIN_ID'))
 GAS_LIMIT = int(environ.get('GAS_LIMIT'))
 GWEI_PRICE = environ.get('GWEI_PRICE')
+CLIENT_ADDRESS = environ.get('CLIENT_ADDRESS')
 
-w3 = Web3(HTTPProvider('http://127.0.0.1:8545'))
+w3 = Web3(HTTPProvider(CLIENT_ADDRESS))
 account = w3.eth.account.privateKeyToAccount(SK)
 
 oneEth = Decimal('1000000000000000000')
@@ -27,7 +28,6 @@ oneEth = Decimal('1000000000000000000')
 logging.basicConfig(filename='faucet.log',
                     level=logging.DEBUG,
                     format='%(asctime)s|%(levelname)s|%(message)s')
-addresses_log = open('addresses.log', 'a')
 
 # Real web app
 app = Flask(__name__)
@@ -67,9 +67,10 @@ def faucet_send():
             })
         signed = account.signTransaction(transfer_tx)
         txid = w3.eth.sendRawTransaction(signed.rawTransaction).hex()
-        addresses_log.write("{},{},{},{}\n".format(datetime.datetime.now(),
-                                                   request.remote_addr,
-                                                   address, txid))
+        with open('addresses.log', 'a') as addresses_log:
+            addresses_log.write("{},{},{},{}\n".format(datetime.datetime.now(),
+                                                       request.remote_addr,
+                                                       address, txid))
         return jsonify({'success': True, 'txid': f'{txid}'})
     except:
         return jsonify({'success': False,
