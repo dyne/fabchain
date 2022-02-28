@@ -146,10 +146,10 @@ server-list: ## print a list of servers and their status
 	@hcloud server list -o columns=name,status,ipv4,datacenter
 
 ssh: HOST ?= sign-1
-ssh: USER ?= root
+ssh: USR ?= root
 ssh: ## open an ssh session on HOST=name (see make server-list)
 	@ssh $(shell hcloud server list -o noheader -o columns=name,ipv4 | awk '/${HOST}/{print $$2}') \
-	 -l ${USER} -i ./sshkey -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes 
+	 -l ${USR} -i ./sshkey -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes 
 
 server-cmd: CMD ?= describe
 server-cmd: ## execute an hcloud server command on all nodes
