@@ -69,7 +69,7 @@ def faucet_send():
             })
         signed = account.signTransaction(transfer_tx)
         txid = w3.eth.sendRawTransaction(signed.rawTransaction).hex()
-        address_logger.info("{},{},{}\n".format(request.remote_addr,
+        address_logger.info("{},{},{}".format(request.remote_addr,
                                                 address, txid))
         return jsonify({'success': True, 'txid': f'{txid}'})
     except:
