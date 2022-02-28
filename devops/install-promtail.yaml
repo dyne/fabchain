@@ -67,7 +67,13 @@
               labels:
                 job: geth-{{ ansible_hostname }}
                 __path__: /home/app/dyneth/data/geth.log
-
+          {% if 'api' in ansible_hostname %}- job_name: faucet
+            static_configs:
+            - targets:
+                - localhost
+              labels:
+                job: faucet-{{ ansible_hostname }}
+                __path__: /home/app/dyneth/web/faucet/*.log{% endif %}
   - name: promtail systemd configuration
     blockinfile:
       dest: /etc/systemd/system/promtail.service
