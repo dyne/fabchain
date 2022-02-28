@@ -27,8 +27,10 @@ oneEth = Decimal('1000000000000000000')
 # Setup logging
 logging.basicConfig(filename='faucet.log',
                     level=logging.DEBUG,
-                    format='%(asctime)s|%(levelname)s|%(message)s')
+                    format='%(asctime)s|%(name)s|%(levelname)s|%(message)s')
 
+address_logger = logging.getLogger(__name__ + '.new_txid')
+address_logger.setLevel(level=logging.INFO)
 # Real web app
 app = Flask(__name__)
 
@@ -67,10 +69,8 @@ def faucet_send():
             })
         signed = account.signTransaction(transfer_tx)
         txid = w3.eth.sendRawTransaction(signed.rawTransaction).hex()
-        with open('addresses.log', 'a') as addresses_log:
-            addresses_log.write("{},{},{},{}\n".format(datetime.datetime.now(),
-                                                       request.remote_addr,
-                                                       address, txid))
+        address_logger.info("{},{},{}\n".format(request.remote_addr,
+                                                address, txid))
         return jsonify({'success': True, 'txid': f'{txid}'})
     except:
         return jsonify({'success': False,
