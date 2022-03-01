@@ -67,6 +67,13 @@
               labels:
                 job: geth-{{ ansible_hostname }}
                 __path__: /home/app/dyneth/data/geth.log
+          - job_name: ufw
+            static_configs:
+            - targets:
+                - localhost
+              labels:
+                job: ufw-{{ ansible_hostname }}
+                __path__: /var/log/ufw.log
           {% if 'api' in ansible_hostname %}- job_name: faucet
             static_configs:
             - targets:
