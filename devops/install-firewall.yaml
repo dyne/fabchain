@@ -1,5 +1,5 @@
 ---
-- name: Dyneth node installation
+- name: FABCHAIN FIREWALL SETUP
   hosts: api
   remote_user: root
   vars:
@@ -26,7 +26,7 @@
       proto: tcp
   - name: limit tcp connections
     community.general.ufw:
-      rule: limit
+      rule: allow
       port: "{{ item }}"
       proto: tcp
     loop: "{{ api_ports }}"
