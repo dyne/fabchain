@@ -6,17 +6,6 @@
 IFS=' '
 read -a args <<< "$2"
 
-## translate the chainID from numeric to string
-chain_name=`echo "print(BIG.from_decimal('$NETWORK_ID'):octet():string())" | zenroom`
-
-echo >&2 "Starting geth for chainID: $chain_name ($NETWORK_ID)"
-echo >&2 "advertising public ip: $pubip"
-echo >&2 "args: ${args[@]}"
-
-if [ -r ${data}/pre-execution-script.sh ]; then
-    . ${data}/pre-execution-script.sh
-fi
-
 geth --networkid $NETWORK_ID \
      --verbosity 2 \
      --ipcpath geth.ipc \

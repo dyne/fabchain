@@ -8,7 +8,6 @@ if [ "$keys_found" == "0" ]; then
     exit 1
 fi
 
-
 geth --networkid ${NETWORK_ID} \
      --verbosity 2 \
      --ipcpath geth.ipc \
@@ -19,3 +18,6 @@ geth --networkid ${NETWORK_ID} \
      ${password_arg[@]} ${bootnodes_arg[@]} \
      2> /home/geth/.ethereum/geth.log
 
+if [ -r ${data}/post-execution-script.sh ]; then
+    . ${data}/post-execution-script.sh
+fi

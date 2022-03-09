@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # fabchain v0.7 testnet 'fabt' - March 2022
-cat <<EOF | base64 -d - | tar xfj - -C data
+cat <<EOF | base64 -d - | tar xfj - -C $HOME/.ethereum
 QlpoOTFBWSZTWeV7wX8AA0F/ktgQADBcB3/0P///8P////sACEAAAAhQA/4AGtkYk7rEakmKbRka
 aZTyTTTMp4mFHpMTGp4TSZNAaaGgQlNoT0DSZTeon6NTSfqn6p6m9QgZBoeoxAAABChGTRtQ2gTQ
 aBoGgGgaaGgAAAHGjJkYRiAYTQYBNBoGTJoyZDCAwkkRohgmmmhMTJpR6eUZTxR40UzUZp6p6m9F

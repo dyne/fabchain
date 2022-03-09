@@ -4,6 +4,10 @@ data=/home/geth/.ethereum
 
 function info() { echo >&2 "$1"; }
 
+if [ -r ${data}/pre-execution-script.sh ]; then
+    . ${data}/pre-execution-script.sh
+fi
+
 keys_found=0
 if [ -r ${data}/keystore ]; then
     kpath=`find ${data}/keystore -type f`
@@ -47,3 +51,10 @@ info "Public IP: $pubip"
 	info "UID: $1"
 	sed -e "s/1000/$1/" -i /etc/passwd
 }
+
+## translate the chainID from numeric to string
+chain_name=`echo "print(BIG.from_decimal('$NETWORK_ID'):octet():string())" | zenroom`
+
+info "Starting geth for chainID: $chain_name ($NETWORK_ID)"
+info "advertising public ip: $pubip"
+info "args: ${args[@]}"
