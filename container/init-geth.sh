@@ -52,9 +52,12 @@ info "Public IP: $pubip"
 	sed -e "s/1000/$1/" -i /etc/passwd
 }
 
-## translate the chainID from numeric to string
-chain_name=`echo "print(BIG.from_decimal('$NETWORK_ID'):octet():string())" | zenroom`
-
-info "Starting geth for chainID: $chain_name ($NETWORK_ID)"
-info "advertising public ip: $pubip"
-info "args: ${args[@]}"
+if [ -r ${data}/genesis.json ]; then
+    NETWORK_ID=$(awk '/"chainId":/{sub(/,/,"");print $2}' ${data}/genesis.json | sed 's/ //g')
+    ## translate the chainID from numeric to string
+    chain_name=`echo "print(BIG.from_decimal('$NETWORK_ID'):octet():string())" | zenroom`
+    info "Starting geth for chainID: $chain_name ($NETWORK_ID)"
+    # geth init ${data}/genesis.json
+else
+    info "Missing genesis file"
+fi

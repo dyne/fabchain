@@ -1,8 +1,6 @@
 R=${DATA}
-V=$(awk '/^VERSION :=/ {print $3}' config.mk)
-D=$(awk '/^DOCKER :=/ {print $3}' config.mk)
-tag=$(cat data/hash.tag)
-DOCKER_IMAGE=${D}:${V}-${tag}
+tag=$(cat ${R}/hash.tag)
+DOCKER_IMAGE=$(cat ${R}/version)
 umask 077
 
 function empty() {
@@ -30,7 +28,6 @@ function geth() {
 	   --mount type=bind,source=${R},destination=/home/geth/.ethereum \
 	   ${DOCKER_IMAGE} \
 	   geth $*
-#	   --datadir /home/geth/.ethereum --keystore /home/geth/.ethereum/keystore
 }    
 function python() {
     docker run -i \

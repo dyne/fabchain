@@ -1,9 +1,5 @@
-# FABCHAIN backend configuration
-
-VERSION := 0.7.0
+VERSION := 0.8.0
 DOCKER := dyne/dyneth
-P2P_PORT := 30303
-API_PORT := 8545
 GETH_VERSION := 1.10.16
 SOLC_VERSION := 0.8.12
 ALPINE_VERSION := 3.15

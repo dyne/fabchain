@@ -1,0 +1,4 @@
+# fabt (1717658228)
+NETWORK  := fabt
+P2P_PORT := 30303
+API_PORT := 8545

@@ -11,7 +11,7 @@ ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 ENV GO111MODULE on
 LABEL maintainer="Denis Roio <jaromil@dyne.org>" \
-	  homepage="https://eth.dyne.org"
+	  homepage="https://fabchain.net"
 
 # echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
 RUN apk add --no-cache ca-certificates curl mawk shadow bash libgcc libstdc++ \
@@ -19,11 +19,10 @@ RUN apk add --no-cache ca-certificates curl mawk shadow bash libgcc libstdc++ \
 RUN pip install web3 && pip cache purge
 
 RUN curl -so /usr/local/bin/zenroom \
-    https://files.dyne.org/zenroom/nightly/zenroom-linux-amd64 \
+     https://files.dyne.org/zenroom/nightly/zenroom-linux-amd64 \
     && chmod +x /usr/local/bin/zenroom
 COPY --from=geth /go/bin/* /usr/local/bin/
 COPY --from=solc /usr/local/bin/solc /usr/local/bin
-COPY genesis.conf /etc/dyneth/genesis.conf
 COPY init-geth.sh /
 COPY start-geth-api.sh /
 COPY start-geth-signer.sh /

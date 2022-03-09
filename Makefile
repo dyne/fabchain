@@ -1,11 +1,12 @@
 HOME ?= $(shell pwd)
+CONFIG ?= testnet
 
-include config.mk
+include ${CONFIG}.mk
+
 TAG := $(file <data/hash.tag)
-DOCKER_IMAGE := ${DOCKER}:${VERSION}-${TAG}
-NETWORK_ID:=$(if $(wildcard data/genesis.json),$(shell awk '/"chainId":/{sub(/,/,"");print $$2}' data/genesis.json | sed 's/ //g'),1146703429)
-DATA := $(shell pwd)/data
-CONTRACTS := $(shell pwd)/contracts
+DOCKER_IMAGE := $(file <data/version)
+DATA := $(realpath ./data)
+CONTRACTS := $(realpath ./contracts)
 UID = $(id -u)
 GID = $(id -g)
 
@@ -19,18 +20,16 @@ container := $(shell docker container ls | awk '/dyne\/dyneth/ { print $$1 }')
 
 config: init
 	$(info Docker image: '${DOCKER_IMAGE}')
-	$(info Chain ID string: \
-	$(shell echo "print(BIG.from_decimal(${NETWORK_ID}):octet():string())" | zenroom 2>/dev/null))
-	@cat ${DATA}/peerconf.sh
+	docker image inspect ${DOCKER_IMAGE}
 
 init:
 	@bash ./scripts/motd
 	@mkdir -p ${DATA}
-	$(file > ${DATA}/peerconf.sh,NETWORK_ID=${NETWORK_ID})
-	$(file >> ${DATA}/peerconf.sh,P2P_PORT=${P2P_PORT})
-	$(file >> ${DATA}/peerconf.sh,API_PORT=${API_PORT})
 	$(if $(wildcard data/genesis.conf),$(if $(wildcard devops/genesis.conf),$(shell diff data/genesis.conf devops/genesis.conf)))
 	@$(if $(wildcard devops/bootnodes.csv),cp -v devops/bootnodes.csv data/)
+	@echo "NETWORK=${NETWORK}"    > ${DATA}/peerconf.sh
+	@echo "P2P_PORT=${P2P_PORT}" >> ${DATA}/peerconf.sh
+	@echo "API_PORT=${API_PORT}" >> ${DATA}/peerconf.sh
 
 stopped:
 	$(if ${container},\
@@ -47,7 +46,7 @@ run: init stopped upnp-open
 run: ## start the API node listening on HTTP port
 	$(info Using image: ${DOCKER_IMAGE})
 	$(info Launching docker container for the HTTP API service:)
-	@docker  run --restart unless-stopped -d \
+	docker  run --restart unless-stopped -d \
 	--mount "type=bind,source=${CONTRACTS},destination=/contracts" \
 	--mount "type=bind,source=${DATA},destination=/home/geth/.ethereum" \
 	-p ${API_PORT}:${API_PORT} ${DOCKER_IMAGE} \
@@ -117,9 +116,6 @@ stop: ## stop running server
 	@sh ./scripts/upnp.sh close ${P2P_PORT} tcp ;\
 	 sh ./scripts/upnp.sh close ${P2P_PORT} udp
 
-get-gas-price:
-	@bash ./scripts/mk_web3_gasprice.sh | docker exec -i ${container} python3
-
 ##@ Network commands
 
 upnp-open: upnpc=$(shell which upnpc)
@@ -159,6 +155,9 @@ contract-info: init ## obtain contract information about the TXID=hash
 	@cat ${web_info.py} | docker exec -i ${container} python3
 	@rm -f ${web_info.py}
 
+get-gas-price:
+	@bash ./scripts/mk_web3_gasprice.sh | docker exec -i ${container} python3
+
 ##@ Account commands:
 account: init ## create a new private account in data/keystore
 	$(if ${PASS},,$(error PASS is not defined))
@@ -195,40 +194,3 @@ genesis-init: ## Initialize node to use the new chain in data/genesis.json
 	@docker run -it \
 	 --mount type=bind,source=${DATA},destination=/home/geth/.ethereum \
 	 ${DOCKER_IMAGE} geth init /home/geth/.ethereum/genesis.json
-
-##@ Development commands
-
-tag: ## compute the version tag for current build
-	@mkdir -p data
-	@find container -type f -print0 | sort -z \
-	| xargs -0 sha1sum | sha1sum | awk '{print $$1}' \
-	| tee data/hash.tag.new \
-	&& (diff -q data/hash.tag.new data/hash.tag; return 0) \
-	&& mv data/hash.tag.new data/hash.tag
-
-pull: ## pull the image from docker-hub online repo
-	docker pull ${DOCKER_IMAGE}
-
-push: tag ## push the image to docker-hub online repo
-	docker push ${DOCKER_IMAGE}
-
-build: tag ## build the docker container
-	docker build -t ${DOCKER_IMAGE} \
-	 --build-arg ALPINE_VERSION=${ALPINE_VERSION} \
-	 --build-arg GETH_VERSION=${GETH_VERSION} \
-	 --build-arg SOLC_VERSION=${SOLC_VERSION} \
-	 --build-arg VERSION=${VERSION} \
-	 -f container/Dockerfile container
-
-debug:	init stopped
-debug: ## run a shell in a new interactive container (no daemons)
-	@echo "P2P networking through port ${P2P_PORT}"
-	@echo "HTTP API available at port ${API_PORT}"
-	@echo "Data storage in ~/.ethereum" && echo
-	@echo "Debugging docker container:"
-	docker run -it --user root -p ${P2P_PORT}:${P2P_PORT}/tcp \
-	 -p ${P2P_PORT}:${P2P_PORT}/udp -p ${API_PORT}:${API_PORT} \
-	 --mount "type=bind,source=${DATA},destination=/home/geth/.ethereum" \
-	 --mount "type=bind,source=${CONTRACTS},destination=/contracts" \
-	 ${DOCKER_IMAGE} bash
-

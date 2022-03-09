@@ -1,0 +1,10 @@
+devops/hosts.toml
+devops/sshkey
+devops/sshkey.pub
+data/genesis.json
+data/bootnodes.csv
+data/geth.log
+data/geth
+data/keystore
+data/history
+data/peerconf.sh

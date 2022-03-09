@@ -1,7 +1,8 @@
 #!/bin/sh
 
-# fabchain v0.7 testnet 'fabt' - March 2022
-cat <<EOF | base64 -d - | tar xfj - -C $HOME/.ethereum
+if [ "$NETWORK" == "fabt" ]; then
+    # fabchain v0.7 testnet 'fabt' - March 2022
+    cat <<EOF | base64 -d - | tar xfj - -C $HOME/.ethereum
 QlpoOTFBWSZTWeV7wX8AA0F/ktgQADBcB3/0P///8P////sACEAAAAhQA/4AGtkYk7rEakmKbRka
 aZTyTTTMp4mFHpMTGp4TSZNAaaGgQlNoT0DSZTeon6NTSfqn6p6m9QgZBoeoxAAABChGTRtQ2gTQ
 aBoGgGgaaGgAAAHGjJkYRiAYTQYBNBoGTJoyZDCAwkkRohgmmmhMTJpR6eUZTxR40UzUZp6p6m9F
@@ -24,4 +25,5 @@ SbeaQT4q0jkd+Oxp4ZIKEh3Z9yhkyslcUmbnDjgZNJEAEABFp6AoIFKAOmstyY68EhEJ+88YEKRi
 QKmG67NOhcnISUgGvJhlODtOIXciM76YiiskEYxBUrmf1sCs6d9pZWp+BhRYjipr423RKK4vUAEc
 5NMZMrCY5p1dI+Ee1elPtpL8Mvfj0ZFE3L9BLz8vsCeZnAl/4u5IpwoSHK94L+A=
 EOF
+fi
 
