@@ -6,7 +6,7 @@ DOCKER_IMAGE=${D}:${V}-${tag}
 umask 077
 
 function empty() {
-    if [[ -r ${R}/keystore ]]; then
+    if [[ "$(ls -A ${R}/keystore 2>/dev/null)" ]]; then
 	echo "ERROR: account already created, will not overwrite"
 	echo "  see: ${R}/keystore"
 	echo "  try: make backup"
@@ -15,7 +15,7 @@ function empty() {
     fi
 }
 function have() {
-    if [[ ! -r ${R}/keystore ]]; then
+    if ! [[ "$(ls -A ${R}/keystore 2>/dev/null)" ]]; then
 	echo "ERROR: account not found"
 	echo "  see: ${R}/keystore"
 	echo "  try: make account"
