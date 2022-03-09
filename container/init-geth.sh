@@ -2,7 +2,7 @@
 
 data=/home/geth/.ethereum
 
-function info() { echo 2>& "$1"; }
+function info() { echo >&2 "$1"; }
 
 keys_found=0
 if [ -r ${data}/keystore ]; then

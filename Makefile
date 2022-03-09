@@ -76,7 +76,7 @@ run-signer-fg:
 	 ${DOCKER_IMAGE} sh /start-geth-signer.sh ${UID}
 
 status: init
-status: ## see if server is running and print public addres
+status: ## see if server is running and print public address
 	$(if ${container},\
 		$(info Status: RUNNING),\
 		$(info Status: NOT RUNNING))
