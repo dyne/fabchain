@@ -1,5 +1,6 @@
-include ../config.mk
-R ?= $(shell pwd)
+R ?= $(realpath .)
+CONFIG ?= testnet
+include ../${CONFIG}.mk
 
 ##@ General
 help: ## Display this help.

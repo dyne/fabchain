@@ -4,7 +4,12 @@
   remote_user: app
   tasks:
 
-  - name: pull
-    shell: git checkout . && git pull --rebase && make pull
+  - name: pull git repo
+    shell: git checkout . && git pull --rebase
+    args:
+      chdir: ~/dyneth
+
+  - name: pull docker image
+    shell: make -C container pull
     args:
       chdir: ~/dyneth
