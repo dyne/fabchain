@@ -24,15 +24,15 @@
       rule: limit
       port: ssh
       proto: tcp
-  - name: limit TCP connections
+  - name: Allow P2P TCP connections
     community.general.ufw:
-      rule: limit
+      rule: allow
       port: "{{ item }}"
       proto: tcp
     loop: "{{ sign_ports }}"
-  - name: limit UDP connections
+  - name: Allow P2P UDP connections
     community.general.ufw:
-      rule: limit
+      rule: allow
       port: "{{ item }}"
       proto: udp
     loop: "{{ sign_ports }}"

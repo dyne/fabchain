@@ -24,7 +24,7 @@
       rule: limit
       port: ssh
       proto: tcp
-  - name: limit tcp connections
+  - name: Allow API tcp connections
     community.general.ufw:
       rule: allow
       port: "{{ item }}"
