@@ -1,25 +1,46 @@
 ---
 - name: install the block explorer
   hosts: api
-  remote_user: app
+  remote_user: root
   tasks:
-    - name: Install nvm
-      shell: >
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-        creates=/home/{{ ansible_user_id }}/.nvm/nvm.sh
-
-    - name: Install node and set version 8
-      shell: >
-        /bin/bash -c "source ~/.nvm/nvm.sh && nvm install 8 && nvm alias default 8"
-        creates=/home/{{ ansible_user_id }}/.nvm/alias
+    - name: Install nginx
+      ansible.builtin.package:
+        name:
+          - nginx
+        state: latest
 
     - name: clone block explorer
       git: repo=https://github.com/etherparty/explorer dest=~/explorer force=true
 
     - name: start the block explorer
       shell: >
-        /bin/bash -c "source ~/.nvm/nvm.sh && tmux new -d -s explorer 'sed -i '\''s/localhost/{{ inventory_hostname }}/g'\'' package.json && sed -i '\''s/localhost/{{ inventory_hostname }}/g'\'' app/app.js  && npm start'"
+        /bin/bash -c "sed -i 's/localhost/{{ inventory_hostname }}/g' package.json && sed -i 's/localhost/{{ inventory_hostname }}/g' app/app.js"
       args:
         chdir: ~/explorer
 
+    - name: Configuration for nginx
+      blockinfile:
+        dest: /etc/nginx/sites-enabled/explorer
+        create: true
+        block: |
+          server {
+                  listen 8000 default_server;
+                  listen [::]:8000 default_server;
 
+                  server_name _;
+                  root /home/app/explorer/app;
+                  include /etc/nginx/mime.types;
+
+                  location ~ ^/tx/(.*) {
+                          return 301 $scheme://test.fabchain.net:8000/#/transaction/$1;
+                  }
+                  location / {
+                          try_files $uri /index.html;
+                  }
+          }
+
+    - name: Restart nginx
+      ansible.builtin.systemd:
+        state: restarted
+        daemon_reload: yes
+        name: nginx
