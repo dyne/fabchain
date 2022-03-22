@@ -7,6 +7,8 @@
   vars:
     contract: "{{ lookup('env','CONTRACT') or '0x14aD0baF28b67ae3905CFe8E2e5eA296278Ec4ab'}}"
     chain_id: "{{ lookup('env','CHAIN_ID') or '1717658228'}}"
+    network_path: "/home/app/fabchain/"
+    faucet_path: "{{ network_path }}/web/faucet/"
   tasks:
   - name: install package dependencies
     ansible.builtin.package:
@@ -15,10 +17,11 @@
        - python3-pip
        - python3-dev
        - build-essential
+       - nginx
       state: latest
 
   - name: read contract address
-    shell: /bin/bash -c "cd /home/app/dyneth && make backup-secret | awk '{ print $2 }'"
+    shell: /bin/bash -c "cd {{ network_path }} && make backup-secret | awk '{ print $2 }'"
     register: sk
 
   - debug: 
@@ -43,35 +46,72 @@
   - name: generate .env
     copy:
       src: ../web/faucet/.env.example
-      dest: /home/app/dyneth/web/faucet/.env
+      dest: "{{ faucet_path }}/.env"
 
   - name: add private key to .env
     lineinfile:
-      path: /home/app/dyneth/web/faucet/.env
+      path: "{{ faucet_path }}/.env"
       line: "SK={{ sk.stdout_lines | last }}"
 
   - name: add contract address to .env
     lineinfile:
-      path: /home/app/dyneth/web/faucet/.env
+      path: "{{ faucet_path }}/.env"
       line: "CONTRACT_ADDRESS={{ contract }}"
 
   - name: add contract address to .env
     lineinfile:
-      path: /home/app/dyneth/web/faucet/.env
+      path: "{{ faucet_path }}/.env"
       line: "CHAIN_ID={{ chain_id }}"
 
   - name: install pipenv
     shell: /bin/bash -c "pip3 install pipenv"
 
-  - name: install environment
-    shell: /bin/bash -c "cd /home/app/dyneth/web/faucet && pipenv lock"
+  - name: start faucet with gunicorn
+    shell: /bin/bash -c "cd {{ faucet_path }} && tmux new -d -s faucet \"pipenv lock && pipenv sync && pipenv run gunicorn --workers 3 --bind 0.0.0.0:5001 faucet:app\""
     become: true
 
-  - name: install environment
-    shell: /bin/bash -c "cd /home/app/dyneth/web/faucet && pipenv sync"
-    become: true
+      ## systemd service for gunicorn (doesn't work)
+      #- name: service for gunicorn
+      #blockinfile:
+      #dest: /etc/systemd/system/gunicorn.service
+      #create: true
+      #block: |
+      #[Unit]
+      #Description=gunicorn daemon
+      #After=network.target
+      #
+      #[Service]
+      #User=www-data
+      #Group=www-data
+      #WorkingDirectory={{ faucet_path }}
+      #
+      #ExecStart=/bin/bash -c "pipenv lock && pipenv sync && pipenv run gunicorn --workers 3 --bind unix:/tmp/faucet.sock faucet:app"
+      #
+      #[Install]
+      #WantedBy=multi-user.target
 
-  - name: start flask app
-    shell: /bin/bash -c "cd /home/app/dyneth/web/faucet && tmux new -d -s faucet \"FLASK_APP=faucet pipenv run flask run --host 0.0.0.0\""
-    become: true
+
+  - name: Configuration for nginx
+    blockinfile:
+      dest: /etc/nginx/sites-enabled/faucet
+      create: true
+      block: |
+        server {
+                listen 5000 default_server;
+                listen [::]:5000 default_server;
+
+                server_name _;
+                location / {
+                        include proxy_params;
+                        proxy_pass http://127.0.0.1:5001;
+                }
+        }
+
+
+  - name: Restart nginx
+    ansible.builtin.systemd:
+      state: restarted
+      daemon_reload: yes
+      name: nginx
+
 
