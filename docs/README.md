@@ -1,6 +1,17 @@
 
 ![FABCHAIN](fabchain_logo.jpg)
 
+# Web3 playground
+
+Welcome hackers!
+
+Feel free to play around with FABT using Metamask, upload and operate
+your Solidity smart-contracts using Remix. Money is not required, just
+tap into the [FABT testnet faucet](http://test.fabchain.net:5000/) to
+receive one coin per address per day.
+
+To get in touch, [join the Fabchain telegram group](https://t.me/+a1cMevbmi2o3MDQ8).
+
 # FABT Testnet
 
 Current status: **FREE FOR ALL!**
@@ -23,6 +34,10 @@ testnet may be reset and/or forked at any time without notice.
 # FAB Network
 
 Current status: **WORK IN PROGRESS**
+
+![EU Regional Fund](eu-regional-fund.png)
+
+Supported Interfacer by [Fabcity Hamburg](https://fabcity.hamburg)
 
 <p>
   <a href="https://dyne.org">
