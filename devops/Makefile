@@ -86,6 +86,10 @@ init-bootnodes: inventory ## generate bootnodes from signer ENR addresses
 	bash ./join_enr.sh
 	make upload-bootnodes
 
+update-bootnodes: inventory ## generate bootnodes from signer ENR addresses
+	$(call ANSIPLAY, update-bootnodes.yaml)
+	bash ./join_enr.sh
+
 init-bootnodes-steps: steps
 
 upload-bootnodes: IPS := $(shell hcloud server list -o noheader -o columns=ipv4 | xargs)
@@ -97,6 +101,9 @@ upload-bootnodes: ## upload bootnodes.csv (used by init-bootnodes)
 	done
 	make stop
 	make start
+
+pack-genesis:
+	tar cvfj - genesis.json bootnodes.csv  | base64
 
 ##@ Server management
 
