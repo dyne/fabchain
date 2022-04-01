@@ -77,7 +77,6 @@ for i in $(seq 10); do
     echo "`date -u "+%y/%m/%d_%H:%M:%S_%Z"`;$((5+10*i))"
     exit 0
   fi
-  echo $RESULT
   sleep 10
 done
 echo "`date -u "+%y/%m/%d_%H:%M:%S_%Z"`;ERROR"
