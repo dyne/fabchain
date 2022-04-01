@@ -1,5 +1,5 @@
 
-![FABCHAIN](fabchain_logo.jpg)
+<!-- ![FABCHAIN](fabchain_logo.jpg) -->
 
 # Web3 playground
 
