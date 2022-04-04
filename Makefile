@@ -40,6 +40,7 @@ running:
 		$(error Container is not running))
 
 ##@ Server commands
+start: run
 
 run: ARGS ?= --syncmode snap --http.vhosts "*" --http.corsdomain "*"
 run: init stopped upnp-open
@@ -112,7 +113,8 @@ command: init running
 stop:	init running upnp-close
 stop: ## stop running server
 	@echo >&2 "Stopping container: ${container}"
-	@docker container stop ${container}
+	@docker update --restart no ${container}
+	@CMD="killall -INT geth" make shell
 	@sh ./scripts/upnp.sh close ${P2P_PORT} tcp ;\
 	 sh ./scripts/upnp.sh close ${P2P_PORT} udp
 
