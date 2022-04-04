@@ -30,6 +30,16 @@ WITHOUT ANY WARRANTY; without even the implied warranty of RELIABLE
 SERVICE PROVISION or FITNESS FOR A PARTICULAR PURPOSE. The FABT
 testnet may be reset and/or forked at any time without notice.
 
+## List of incidents
+
+Here an "hall of fame" listing the incidents we have detected, their origin and nature.
+
+| Incident      | Date     | Origin                               | Geth version | Nature                    |
+|---------------|----------|--------------------------------------|--------------|---------------------------|
+| API node down | 4/4/2022 | 195.123.222.16 (Meppel, Drenthe, NL) | 1.10.17      | eth.sendTransaction flood |
+
+We take reliability seriously and are regularly monitoring our network to better learn how to manage a permissionless Geth based network the proper way on our path to Main Fabchain deployement.
+
 
 # FAB Network
 
