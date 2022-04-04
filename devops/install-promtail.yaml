@@ -66,7 +66,7 @@
                 - localhost
               labels:
                 job: geth-{{ ansible_hostname }}
-                __path__: /home/app/dyneth/data/geth.log
+                __path__: /home/app/fabchain/data/geth.log
           - job_name: ufw
             static_configs:
             - targets:
@@ -80,7 +80,7 @@
                 - localhost
               labels:
                 job: faucet-{{ ansible_hostname }}
-                __path__: /home/app/dyneth/web/faucet/*.log{% endif %}
+                __path__: /home/app/fabchain/web/faucet/*.log{% endif %}
   - name: promtail systemd configuration
     blockinfile:
       dest: /etc/systemd/system/promtail.service

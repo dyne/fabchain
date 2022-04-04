@@ -41,7 +41,7 @@ cat <<EOF >store-string.keys
   "gas limit": "100000",
   "gas price": "`echo "print($(gasprice | xargs))" | python3`",
   "gwei value": "0",
-  "storage_contract": "E54c7b475644fBd918cfeDC57b1C9179939921E6",
+  "storage_contract": "f0562148463aD4D3A8aB59222E2e390332Fc4a0d",
   "ethereum nonce": "$HEXNONCE",
   "data": "Nel mezzo del cammin di nostra vita\nmi ritrovai per una selva oscura,\nché la diritta via era smarrita."
 }
@@ -50,7 +50,6 @@ EOF
 cat <<EOF >store-string.zen
 Scenario ethereum
 Given I have the 'keys'
-Given I have a ethereum endpoint named 'fabchain'
 Given I have a 'ethereum address' named 'storage contract'
 Given I have a 'ethereum nonce'
 Given I have a 'string' named 'data'
@@ -68,12 +67,22 @@ RAW=`$Z -z store-string.zen -k store-string.keys 2>/dev/null | jq ".signed_ether
 TXID=`send "0x$RAW" | xargs`
 sleep 5
 for i in $(seq 10); do
-  RESULT=`txreceipt "$TXID"`
-  if [[ ! $RESULT == "null" ]]; then
-    echo "`date -u "+%y/%m/%d_%H:%M:%S_%Z"`;$((5+10*i))"
-    exit 0
+  RECEIPT=`txreceipt "$TXID"`
+  if [[ ! "$RECEIPT" == "null" && ! "$RECEIPT" == "" ]]; then
+    STATUS=`echo $RECEIPT | jq ".status" | xargs`
+    LOGS=`echo $RECEIPT | jq ".logs" | xargs`
+    if [[ "$STATUS" == "0x1" && ! "$LOGS" == "[]" ]]; then
+      echo "`date -u "+%y/%m/%d_%H:%M:%S_%Z"`;$((5+10*i));$TXID"
+      exit 0
+    elif [[ ! "$STATUS" == "0x1" ]]; then
+      echo "`date -u "+%y/%m/%d_%H:%M:%S_%Z"`;FAILED;$TXID"
+      exit -1
+    else
+      echo "`date -u "+%y/%m/%d_%H:%M:%S_%Z"`;NOLOGS;$TXID"
+      exit -1
+    fi
   fi
   sleep 10
 done
-echo "`date -u "+%y/%m/%d_%H:%M:%S_%Z"`;ERROR"
+echo "`date -u "+%y/%m/%d_%H:%M:%S_%Z"`;ERROR;$TXID"
 exit -1
