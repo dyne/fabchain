@@ -48,23 +48,19 @@ cat <<EOF >store-string.keys
 EOF
 
 cat <<EOF >store-string.zen
-Rule unknown ignore
 Scenario ethereum
 Given I have the 'keys'
 Given I have a ethereum endpoint named 'fabchain'
 Given I have a 'ethereum address' named 'storage contract'
 Given I have a 'ethereum nonce'
-Given I read the ethereum nonce for 'my_address'
 Given I have a 'string' named 'data'
 and a 'gas price'
 and a 'gas limit'
-# Given I read the # ethereum suggested gas price
 When I create the ethereum transaction to 'storage contract'
 and I use the ethereum transaction to store 'data'
 
 When I create the signed ethereum transaction for chain 'fabt'
 Then print the 'signed ethereum transaction'
-Then I ask ethereum to broadcast the 'signed_ethereum_transaction' and save the transaction id in 'txid'
 Then print data
 EOF
 
