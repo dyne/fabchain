@@ -7,7 +7,7 @@
   vars:
     contract: "{{ lookup('env','CONTRACT') or '0x14aD0baF28b67ae3905CFe8E2e5eA296278Ec4ab'}}"
     chain_id: "{{ lookup('env','CHAIN_ID') or '1717658228'}}"
-    network_path: "/home/app/fabchain/"
+    network_path: "/home/app/dyneth/"
     faucet_path: "{{ network_path }}/web/faucet/"
   tasks:
   - name: install package dependencies
@@ -101,6 +101,10 @@
                 listen [::]:5000 default_server;
 
                 server_name _;
+                location /static/ {
+                        root /home/app/dyneth/web/faucet/;
+                }
+
                 location / {
                         include proxy_params;
                         proxy_pass http://127.0.0.1:5001;
