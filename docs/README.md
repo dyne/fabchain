@@ -37,6 +37,7 @@ Here an "hall of fame" listing the incidents we have detected, their origin and 
 | Incident      | Date     | Origin                               | Geth version | Nature                    |
 |---------------|----------|--------------------------------------|--------------|---------------------------|
 | API node down | 4/4/2022 | 195.123.222.16 (Meppel, Drenthe, NL) | 1.10.17      | eth.sendTransaction flood |
+| API node down | 8/4/2022 | 116.203.190.179 (Hetzner, DE)        | 1.10.17      | wallet pass bruteforce    |
 
 We take reliability seriously and are regularly monitoring our network to better learn how to manage a permissionless Geth based network the proper way on our path to Main Fabchain deployement.
 
