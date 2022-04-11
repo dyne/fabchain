@@ -2,8 +2,8 @@
 HOST="http://test.fabchain.net:8545"
 ZENROOM_URL="https://files.dyne.org/zenroom/nightly/zenroom-linux-amd64"
 Z=./zenroom
-MYADDR="28c44EeA27c304bE7416a220515A823E29a0Fb83"
-MYSK="2bb7018d08990874cea523d52642ecd470021a4e7d8b93553bbfcd2343ee8b37"
+MYADDR="231C6f2f3a07b309f04fea3d675C8e191276EC9b"
+MYSK="f11e5fd92f539e00e005a7d9440a6e48afc79c7dd2512562745a606cb8bfc339"
 
 if [ ! -f "$Z" ]; then
   echo "===Download zenroom==="
@@ -37,11 +37,10 @@ cat <<EOF >store-string.keys
 {
   "keys": { "ethereum": "$MYSK" },
   "my_address": "$MYADDR",
-  "fabchain": "$HOST",
   "gas limit": "100000",
   "gas price": "`echo "print($(gasprice | xargs))" | python3`",
   "gwei value": "0",
-  "storage_contract": "f0562148463aD4D3A8aB59222E2e390332Fc4a0d",
+  "storage_contract": "42A998bf52284703deCdCF20d3FE3C8997a6DE26",
   "ethereum nonce": "$HEXNONCE",
   "data": "Nel mezzo del cammin di nostra vita\nmi ritrovai per una selva oscura,\nché la diritta via era smarrita."
 }
