@@ -141,6 +141,9 @@ install-firewall: inventory ## setup firewall rules on all nodes (API_ and SIGN_
 create-accounts: inventory ## create accounts on all servers
 	$(call ANSIPLAY, create-accounts.yaml)
 
+create-bootnodes: inventory ## create current list of bootnodes
+	$(call ANSIPLAY, create-bootnodes.yaml)
+
 install-explorer: inventory ## install the block explorer on the api node
 	$(call ANSIPLAY, install-explorer.yaml)
 

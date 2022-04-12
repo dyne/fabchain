@@ -20,17 +20,6 @@ fi
 eval hexpk=`cat $kpath | awk -F: '/address/ {print $2}' RS=,`
 info "Public address: $hexpk"
 
-## parse bootnodes enr
-bootnodes_csv="$HOME/.ethereum/bootnodes.csv"
-bootnodes_enr=""
-if [ -r "$bootnodes_csv" ]; then
-    while read i; do
-	if ! [ "$bootnodes_enr" == "" ]; then bootnodes_enr="${bootnodes_enr},"; fi
-	bootnodes_enr="${bootnodes_enr}$(echo $i | cut -d' ' -f2)"
-    done < $bootnodes_csv
-fi
-info "Bootnodes: $bootnodes_enr"
-
 bootnodes_arg=()
 if ! [ "$bootnodes_enr" == "" ]; then
 	bootnodes_arg=(--bootnodes $bootnodes_enr)
