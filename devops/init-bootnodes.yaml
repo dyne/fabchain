@@ -48,12 +48,12 @@
   - pause:
       seconds: 2
 
-  - name: Generate enr
-    command: make enr
-    register: enr
+  - name: Generate enode
+    command: make enode
+    register: enode
     args:
       chdir: ~/dyneth
 
-  - debug: var=enr.stdout
+  - debug: var=enode.stdout
 
-  - local_action: copy content="{{ enr.stdout_lines.0 }}" dest="enr-{{ inventory_hostname }}"
+  - local_action: copy content="{{ enode.stdout_lines.0 }}" dest="enode-{{ inventory_hostname }}"

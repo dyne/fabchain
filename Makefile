@@ -42,7 +42,6 @@ running:
 ##@ Server commands
 start: run
 
-run: ARGS ?= --syncmode snap --http.vhosts "*" --http.corsdomain "*"
 run: init stopped upnp-open
 run: ## start the API node listening on HTTP port
 	$(info Using image: ${DOCKER_IMAGE})
@@ -51,11 +50,17 @@ run: ## start the API node listening on HTTP port
 	--mount "type=bind,source=${CONTRACTS},destination=/contracts" \
 	--mount "type=bind,source=${DATA},destination=/home/geth/.ethereum" \
 	-p ${API_PORT}:${API_PORT} ${DOCKER_IMAGE} \
-	  bash /start-geth-api.sh "${UID}" "${ARGS}"
+	  bash /start-geth-api.sh "${UID}"
 	$(info P2P networking through port ${P2P_PORT})
 	$(info HTTP API available at http://127.0.0.1:${API_PORT})
 	$(info run 'make console' to attach the geth console)
 	$(info run 'make shell' to attach the running docker)
+
+.PHONY: create-config
+create-config: NODE ?= api
+create-config: ## create the configuration file for an API node
+	# make -C devops create-bootnodes
+	@bash ./scripts/create-config.sh ${NODE} "${NETWORK}" "${API_PORT}" "${P2P_PORT}"
 
 run-signer: init stopped upnp-open
 run-signer: ## start the SIGNER node networking on the P2P port
