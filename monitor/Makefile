@@ -14,3 +14,7 @@ graph-dot: ## generate a grapviz dot file with the current peer network graph
 	  awk '/^make/{next} {print $$0}' >> server_peers.txt; \
 	done
 #	zenroom servers2dot.lua -k server_peers.txt -a servers_names.txt
+
+.PHONY: fabric-manager
+fabric-manager:
+	cd fabric-manager && pipenv install && pipenv run python genDot.py
