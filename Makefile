@@ -100,6 +100,15 @@ enr: running ## Obtain the ENR node record (admin.nodeInfo.enr)
 	@docker exec -it --user geth ${container} geth attach --exec admin.nodeInfo.enr \
 	| xargs | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g"
 
+enode: running ## Obtain the enode of the node
+	$(if $(wildcard data/geth/chaindata/CURRENT),,\
+	$(error No genesis initialized on node))
+	@pk=`bash -c "source ./scripts/host-lib.sh && public_key"` && \
+	ip=`hostname -I | cut -d ' ' -f1` && \
+	port=$$P2P_PORT && \
+	echo "enode://$$pk@$$ip:$$port"
+
+
 console: init running
 console: ## open the geth console inside running server
 	@echo >&2 "Console starting"

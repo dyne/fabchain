@@ -64,3 +64,7 @@ with open(keyfile_path) as keyfile:
     print(private_key.hex())
 EOF
 }
+function public_key() {
+  # cut used to remove 0x and the first byte of the public key
+  echo "print(ECDH.pubgen(O.from_hex(\"`secret_key | cut -c 3-`\")):hex())" | zenroom 2>/dev/null | cut -c 3-
+}
