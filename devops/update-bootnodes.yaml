@@ -1,0 +1,32 @@
+---
+- name: Create the list of bootnodes in enr format
+  hosts: sign
+  remote_user: app
+  vars:
+    ansible_remote_tmp: /tmp
+  tasks:
+  - name: delete bootnodes.csv
+    file:
+      path: ~/dyneth/data/bootnodes.csv
+      state: absent
+
+  - name: touch empty bootnodes.csv
+    file:
+      path: ~/dyneth/data/bootnodes.csv
+      state: touch
+
+  - name: clean local enr files
+    local_action: command /bin/rm -f enr*
+
+  - pause:
+      seconds: 2
+
+  - name: Generate enr
+    command: make enr
+    register: enr
+    args:
+      chdir: ~/dyneth
+
+  - debug: var=enr.stdout
+
+  - local_action: copy content="{{ enr.stdout_lines.0 }}" dest="enr-{{ inventory_hostname }}"
