@@ -42,7 +42,7 @@ running:
 ##@ Server commands
 start: run
 
-run: init stopped upnp-open
+run: init stopped upnp-open create-config
 run: ## start the API node listening on HTTP port
 	$(info Using image: ${DOCKER_IMAGE})
 	$(info Launching docker container for the HTTP API service:)
@@ -62,8 +62,10 @@ create-config: ## create the configuration file for an API node
 	# make -C devops create-bootnodes
 	@bash ./scripts/create-config.sh ${NODE} "${NETWORK}" "${API_PORT}" "${P2P_PORT}"
 
+run-signer: NODE ?= sign
 run-signer: init stopped upnp-open
 run-signer: ## start the SIGNER node networking on the P2P port
+	make create-config
 	$(info Launching docker container for the SIGNING service:)
 	@docker run --restart unless-stopped -d \
 	--mount "type=bind,source=${DATA},destination=/home/geth/.ethereum" \

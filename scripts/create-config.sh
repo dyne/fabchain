@@ -32,6 +32,7 @@ HTTPModules = ["net", "web3", "eth", "personal"]
 
 [Node.P2P]
 ListenAddr = ":$port_p2p"
+NoDiscovery = true
 BootstrapNodes = [$bootnodes]
 BootstrapNodesV5 = [$bootnodes]
 StaticNodes = [$bootnodes]
@@ -49,6 +50,7 @@ IPCPath = "geth.ipc"
 
 [Node.P2P]
 ListenAddr = ":$port_p2p"
+NoDiscovery = true
 BootstrapNodes = [$bootnodes]
 BootstrapNodesV5 = [$bootnodes]
 StaticNodes = [$bootnodes]
