@@ -14,7 +14,7 @@ geth --verbosity 2 \
      --nat extip:${pubip} \
      --config ${data}/api.toml \
      ${password_arg[@]} dumpconfig \
-     > ${data}/newapi.toml
+     > ${data}/currentapi.toml
 
 geth --verbosity 2 \
      --nat extip:${pubip} \

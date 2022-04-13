@@ -83,12 +83,12 @@ init-genesis: inventory ## initialize genesis on all nodes
 
 init-bootnodes: inventory ## generate bootnodes from signer ENR addresses
 	$(call ANSIPLAY, init-bootnodes.yaml)
-	bash ./join_enr.sh
+	bash ./join_enodes.sh
 	make upload-bootnodes
 
-update-bootnodes: inventory ## generate bootnodes from signer ENR addresses
+update-bootnodes: inventory ## generate bootnodes from signer ENR addresses (NO ANSIBLE)
 	$(call ANSIPLAY, update-bootnodes.yaml)
-	bash ./join_enr.sh
+	bash ./join_enodes.sh
 
 init-bootnodes-steps: steps
 
