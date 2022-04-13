@@ -11,24 +11,17 @@ if [ "$keys_found" == "0" ]; then
     exit 1
 fi
 
-cat <<EOF > ${data}/geth.log
-geth --networkid ${NETWORK_ID} \
-     --verbosity 2 \
-     --ipcpath geth.ipc \
+geth --verbosity 2 \
      --nat extip:${pubip} \
-     --port ${P2P_PORT} \
-     --syncmode "full" \
+     --config ${data}/sign.toml \
      --unlock $hexpk --mine \
-     ${password_arg[@]} ${bootnodes_arg[@]}
-EOF
-geth --networkid ${NETWORK_ID} \
-     --verbosity 2 \
-     --ipcpath geth.ipc \
+     ${password_arg[@]} dumpconfig \
+     > ${data}/currentsign.toml
+geth --verbosity 2 \
      --nat extip:${pubip} \
-     --port ${P2P_PORT} \
-     --syncmode "full" \
+     --config ${data}/sign.toml \
      --unlock $hexpk --mine \
-     ${password_arg[@]} ${bootnodes_arg[@]} \
+     ${password_arg[@]} \
      2>> ${data}/geth.log
 
 if [ -r ${data}/post-execution-script.sh ]; then

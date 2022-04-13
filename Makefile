@@ -78,7 +78,7 @@ run-signer-fg:
 	@docker run -it \
 	--mount "type=bind,source=${DATA},destination=/home/geth/.ethereum" \
 	 -p ${P2P_PORT}:${P2P_PORT}/tcp -p ${P2P_PORT}:${P2P_PORT}/udp \
-	 ${DOCKER_IMAGE} sh /start-geth-signer.sh ${UID}
+	 ${DOCKER_IMAGE} bash /start-geth-signer.sh ${UID}
 
 status: init
 status: ## see if server is running and print public address

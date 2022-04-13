@@ -20,11 +20,6 @@ fi
 eval hexpk=`cat $kpath | awk -F: '/address/ {print $2}' RS=,`
 info "Public address: $hexpk"
 
-bootnodes_arg=()
-if ! [ "$bootnodes_enr" == "" ]; then
-	bootnodes_arg=(--bootnodes $bootnodes_enr)
-fi
-
 password_arg=()
 if [ -r "${data}/passfile" ]; then
     password_arg=(--password ${data}/passfile)
