@@ -15,8 +15,8 @@ tag: ## compute the version tag for current build
 	@find . -type f -print0 | sort -z \
 	| xargs -0 sha1sum | sha1sum | awk '{print $$1}' \
 	| tee ${DATA}/hash.tag.new \
-	&& (diff -q ${DATA}/hash.tag.new ${DATA}/hash.tag; return 0) \
-	&& mv ${DATA}/hash.tag.new ${DATA}/hash.tag
+	&& diff -q ${DATA}/hash.tag.new ${DATA}/hash.tag; \
+	mv ${DATA}/hash.tag.new ${DATA}/hash.tag
 	@echo "${DOCKER_IMAGE}" > ${DATA}/version
 
 pull: ## pull the image from docker-hub online repo
