@@ -86,7 +86,7 @@ init-bootnodes: inventory ## generate bootnodes from signer ENR addresses
 	bash ./join_enodes.sh
 	make upload-bootnodes
 
-update-bootnodes: inventory ## generate bootnodes from signer ENR addresses (NO ANSIBLE)
+update-bootnodes: inventory ## generate bootnodes from signer ENR addresses
 	$(call ANSIPLAY, update-bootnodes.yaml)
 	bash ./join_enodes.sh
 
