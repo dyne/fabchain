@@ -25,27 +25,20 @@ def gatherFromNodes():
     client = Client(token=os.getenv('HCLOUD_TOKEN'))
     servers = client.servers.get_all()
     ips = [server.public_net.ipv4.ip for server in servers]
+    names = {server.public_net.ipv4.ip: server.name for server in servers}
     result = {ip: getConnections(ip) for ip in ips}
-    return result
+    return result, names
 
-def generateDot(connections: dict):
-    dotList = []
-    dotList.append("digraph D {");
-    for i,v in connections.items():
-        dotList.extend([f'\t"{i}" -> "{j}"' for j in v])
-
-    dotList.append("}");
-    return '\n'.join(dotList)
-
-def generateGraph(connections: dict):
+def generateGraph(connections: dict, names: dict):
     f = graphviz.Digraph('node_connections', filename='nodes.gv')
 
     for i,v in connections.items():
         for j in v:
-            f.edge(f'{i}', f'{j}')
+            f.edge(f'{names.get(i, i)}', f'{names.get(j,j)}')
 
     f.view()
 if __name__ == '__main__':
     # print(json.dumps(gatherFromNodes()))
     # print(generateDot(gatherFromNodes()))
-    generateGraph(gatherFromNodes())
+    connections, names = gatherFromNodes()
+    generateGraph(connections, names)
