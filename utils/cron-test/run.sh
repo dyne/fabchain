@@ -35,7 +35,7 @@ function gasprice() (
 HEXNONCE=`asknonce "0x$MYADDR" | xargs`
 cat <<EOF >store-string.keys
 {
-  "keys": { "ethereum": "$MYSK" },
+  "keyring": { "ethereum": "$MYSK" },
   "my_address": "$MYADDR",
   "gas limit": "100000",
   "gas price": "`echo "print($(gasprice | xargs))" | python3`",
@@ -48,7 +48,7 @@ EOF
 
 cat <<EOF >store-string.zen
 Scenario ethereum
-Given I have the 'keys'
+Given I have the 'keyring'
 Given I have a 'ethereum address' named 'storage contract'
 Given I have a 'ethereum nonce'
 Given I have a 'string' named 'data'
