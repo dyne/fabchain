@@ -5,6 +5,15 @@
   vars:
     ansible_remote_tmp: /tmp
   tasks:
-  - command: make run-signer
+  - command: make stop
     args:
       chdir: ~/dyneth
+    ignore_errors: yes # SIgner could be already stopped
+  - shell: "make run-signer"
+    args:
+      chdir: ~/dyneth
+    when: DOCKER_IMAGE is not defined
+  - shell: "DOCKER_IMAGE={{DOCKER_IMAGE}} make run-signer"
+    args:
+      chdir: ~/dyneth
+    when: DOCKER_IMAGE is defined

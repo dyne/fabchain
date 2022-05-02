@@ -22,6 +22,14 @@ start: ## start all applications
 	$(call ANSIPLAY, start-signers.yaml)
 	$(call ANSIPLAY, start-apis.yaml)
 
+start-signers: DOCKER_IMAGE ?= ""
+start-signers: ## start all signers
+ifeq (${DOCKER_IMAGE},)
+	$(call ANSIPLAY, start-signers.yaml)
+else
+	$(call ANSIPLAY, start-signers.yaml --extra-vars="DOCKER_IMAGE=${DOCKER_IMAGE}")
+endif
+
 stop: ## stop all applications
 	$(call ANSIPLAY, stop.yaml)
 
