@@ -4,13 +4,15 @@ CONFIG ?= testnet
 include ${CONFIG}.mk
 
 TAG := $(file <data/hash.tag)
-DOCKER_IMAGE := $(file <data/version)
+DOCKER_IMAGE ?= $(file <data/version)
 DATA := $(realpath ./data)
 CONTRACTS := $(realpath ./contracts)
 UID = $(id -u)
 GID = $(id -g)
 
 export
+
+.PHONY: create-config
 
 ##@ General
 help: ## Display this help.
@@ -42,7 +44,7 @@ running:
 ##@ Server commands
 start: run
 
-run: init stopped upnp-open create-config
+run: init stopped upnp-open
 run: ## start the API node listening on HTTP port
 	$(info Using image: ${DOCKER_IMAGE})
 	$(info Launching docker container for the HTTP API service:)
@@ -56,7 +58,6 @@ run: ## start the API node listening on HTTP port
 	$(info run 'make console' to attach the geth console)
 	$(info run 'make shell' to attach the running docker)
 
-.PHONY: create-config
 create-config: NODE ?= api
 create-config: ## create the configuration file for an API node
 	# make -C devops create-bootnodes

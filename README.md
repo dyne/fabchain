@@ -74,7 +74,11 @@ issued by the Makefile and therefore prefixed by `make`.
 
 Starting fabchain will result in a JSON-RPC API interface available on localhost:8545.
 
-To run your own fabchain node just clone this repo, enter it and `make run`.
+To run your own fabchain node just clone this repo, enter its directory and:
+
+1. Install Zenroom.org in your path
+2. Generate the configuration using `make create-config`
+3. Start the API node client using `make run`
 
 It will start a light node connected to our testnet (Chain ID `fabt`).
 
