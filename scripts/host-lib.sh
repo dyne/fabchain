@@ -36,6 +36,13 @@ function python() {
 	   ${DOCKER_IMAGE} \
            python3 $*
 }
+function zenroom() {
+    docker run -i \
+	   --mount type=bind,source=${R},destination=/home/geth/.ethereum \
+	   --mount type=bind,source=${CONTRACTS},destination=/contracts \
+	   ${DOCKER_IMAGE} \
+           zenroom $*
+}
 function pk() {
     conf=${1:-`find ${R}/keystore/ -type f`}
     echo "print(JSON.decode(DATA).address)" | zenroom -a $conf 2> /dev/null

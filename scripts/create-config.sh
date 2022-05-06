@@ -3,6 +3,8 @@ network=$2
 port=$3
 port_p2p=$4
 
+. scripts/host-lib.sh
+
 ## parse bootnodes enode
 bootnodes_csv="devops/bootnodes.csv"
 bootnodes=""
