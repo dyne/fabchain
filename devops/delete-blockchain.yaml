@@ -1,0 +1,11 @@
+---
+- name: Delete blockchain data
+  hosts: all
+  remote_user: app
+  vars:
+    ansible_remote_tmp: /tmp
+  tasks:
+  - name: delete blockchain data
+    file:
+      state: absent
+      path: ~/dyneth/data/geth/

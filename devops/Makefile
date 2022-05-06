@@ -22,6 +22,9 @@ start: ## start all applications
 	$(call ANSIPLAY, start-signers.yaml)
 	$(call ANSIPLAY, start-apis.yaml)
 
+delete-blockchain: ## delete blockchain data
+	$(call ANSIPLAY, delete-blockchain.yaml)
+
 start-signers: DOCKER_IMAGE ?= ""
 start-signers: ## start all signers
 ifeq (${DOCKER_IMAGE},)
@@ -29,6 +32,9 @@ ifeq (${DOCKER_IMAGE},)
 else
 	$(call ANSIPLAY, start-signers.yaml --extra-vars="DOCKER_IMAGE=${DOCKER_IMAGE}")
 endif
+
+start-apis: ## start all apis
+	$(call ANSIPLAY, start-apis.yaml)
 
 stop: ## stop all applications
 	$(call ANSIPLAY, stop.yaml)
@@ -92,7 +98,7 @@ init-genesis: inventory ## initialize genesis on all nodes
 init-bootnodes: inventory ## generate bootnodes from signer ENR addresses
 	$(call ANSIPLAY, init-bootnodes.yaml)
 	bash ./join_enodes.sh
-	make upload-bootnodes
+	#make upload-bootnodes
 
 update-bootnodes: inventory ## generate bootnodes from signer ENR addresses
 	$(call ANSIPLAY, update-bootnodes.yaml)

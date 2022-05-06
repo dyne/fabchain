@@ -11,12 +11,23 @@
 
     - name: clone block explorer
       git: repo=https://github.com/etherparty/explorer dest=~/explorer force=true
+      become: yes
+      become_user: app
 
     - name: start the block explorer
       shell: >
         /bin/bash -c "sed -i 's/localhost/{{ inventory_hostname }}/g' package.json && sed -i 's/localhost/{{ inventory_hostname }}/g' app/app.js"
       args:
         chdir: ~/explorer
+      become: yes
+      become_user: app
+
+    - name: install packages
+      command: npm install
+      args:
+        chdir: ~/dyneth
+      become: yes
+      become_user: app
 
     - name: Configuration for nginx
       blockinfile:

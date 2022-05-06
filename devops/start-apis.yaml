@@ -5,6 +5,10 @@
   vars:
     ansible_remote_tmp: /tmp
   tasks:
+  - command: make stop
+    args:
+      chdir: ~/dyneth
+    ignore_errors: yes # Node could be already stopped
   - command: make run
     args:
       chdir: ~/dyneth

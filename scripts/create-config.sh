@@ -4,7 +4,7 @@ port=$3
 port_p2p=$4
 
 ## parse bootnodes enode
-bootnodes_csv="data/bootnodes.csv"
+bootnodes_csv="devops/bootnodes.csv"
 bootnodes=""
 if [ -r "$bootnodes_csv" ]; then
     while read i; do
