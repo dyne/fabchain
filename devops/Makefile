@@ -146,7 +146,7 @@ install-steps: steps
 
 install-firewall: SIGNERS := [ $(shell hcloud server list -o columns=name,ipv4 | awk '/sign/{printf "'"'"'%s'"'"',",$$2} END{printf"\n"}') ]
 install-firewall: SERVERS := [ $(shell hcloud server list -o noheader -o columns=ipv4 | awk '{printf "'"'"'%s'"'"',",$$1} END{printf"\n"}') ]
-install-firewall: API_PORTS := [ '${API_PORT}', '8000', '5000', '9080' ]
+install-firewall: API_PORTS := [ '${API_PORT}', ${WS_PORT}, '8000', '5000', '9080' ]
 install-firewall: SIGN_PORTS := [ '${P2P_PORT}', '9080' ]
 install-firewall: inventory ## setup firewall rules on all nodes (API_ and SIGN_ PORTS in makefile)
 	SIGNERS="${SIGNERS}" API_PORTS="${API_PORTS}" $(call ANSIPLAY, install-firewall.yaml)

@@ -2,3 +2,4 @@
 NETWORK  := fabt
 P2P_PORT := 30303
 API_PORT := 8545
+WS_PORT := 8546

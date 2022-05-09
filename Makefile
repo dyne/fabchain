@@ -51,7 +51,7 @@ run: ## start the API node listening on HTTP port
 	docker  run --restart unless-stopped -d \
 	--mount "type=bind,source=${CONTRACTS},destination=/contracts" \
 	--mount "type=bind,source=${DATA},destination=/home/geth/.ethereum" \
-	-p ${API_PORT}:${API_PORT} ${DOCKER_IMAGE} \
+	-p ${API_PORT}:${API_PORT} -p ${WS_PORT}:${WS_PORT} ${DOCKER_IMAGE} \
 	  bash /start-geth-api.sh "${UID}"
 	$(info P2P networking through port ${P2P_PORT})
 	$(info HTTP API available at http://127.0.0.1:${API_PORT})

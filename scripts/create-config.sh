@@ -31,6 +31,8 @@ HTTPPort = $port
 HTTPVirtualHosts = ["*"]
 HTTPCors = ["*"]
 HTTPModules = ["net", "web3", "eth", "personal"]
+WSOrigins = ["*"]
+WSHost = "0.0.0.0"
 
 [Node.P2P]
 ListenAddr = ":$port_p2p"
