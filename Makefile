@@ -18,7 +18,7 @@ export
 help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' Makefile
 
-container := $(shell docker container ls | awk '/dyne\/dyneth/ { print $$1 }')
+container := $(shell if [ -r /var/run/docker.sock ]; then docker container ls | awk '/dyne\/dyneth/ { print $$1 }'; else echo "docker not running"; fi)
 
 config: init
 	$(info Docker image: '${DOCKER_IMAGE}')
