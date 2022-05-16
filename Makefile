@@ -60,7 +60,7 @@ run: ## start the API node listening on HTTP port
 
 create-config: NODE ?= api
 create-config: ## create the configuration file for an API node
-	# make -C devops create-bootnodes
+	$(info Creating configuration in data/)
 	@bash ./scripts/create-config.sh ${NODE} "${NETWORK}" "${API_PORT}" "${P2P_PORT}"
 
 run-signer: NODE ?= sign

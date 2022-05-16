@@ -62,6 +62,13 @@ remote-shell: ## execute a shell command on all signers
 	  "app@$$i" "cd dyneth && TERM=linux ${CMD}" ;\
 	done
 
+create-config:
+	make remote-shell CMD='make create-config NODE=sign' ON=sign-1
+	make remote-shell CMD='make create-config NODE=sign' ON=sign-2
+	make remote-shell CMD='make create-config NODE=sign' ON=sign-3
+	make remote-shell CMD='make create-config NODE=api' ON=api
+
+
 remote-copy: ON ?= sign
 remote-copy: IPS := $(shell hcloud server list -o noheader -o columns=name,ipv4 | awk '/${ON}/{print $$2}' | xargs)
 remote-copy: FILE ?= bootnodes.csv
