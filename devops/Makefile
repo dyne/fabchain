@@ -164,7 +164,8 @@ create-accounts: inventory ## create accounts on all servers
 
 create-bootnodes: inventory ## create current list of bootnodes
 	$(call ANSIPLAY, create-bootnodes.yaml)
-	bash ./join_enodes.sh
+	@bash ./join_enodes.sh
+	$(info Bootnode enodes entries created in bootnodes.csv)
 
 install-explorer: inventory ## install the block explorer on the api node
 	$(call ANSIPLAY, install-explorer.yaml)

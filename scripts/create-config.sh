@@ -6,7 +6,7 @@ port_p2p=$4
 . scripts/host-lib.sh
 
 ## parse bootnodes enode
-bootnodes_csv="devops/bootnodes.csv"
+bootnodes_csv="data/bootnodes.csv"
 bootnodes=""
 if [ -r "$bootnodes_csv" ]; then
     while read i; do
