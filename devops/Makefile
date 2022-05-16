@@ -1,5 +1,5 @@
 R ?= $(realpath .)
-CONFIG ?= testnet
+CONFIG := $(shell hcloud context active)
 include ../${CONFIG}.mk
 
 ##@ General
@@ -22,7 +22,7 @@ start: ## start all applications
 	$(call ANSIPLAY, start-signers.yaml)
 	$(call ANSIPLAY, start-apis.yaml)
 
-delete-blockchain: ## delete blockchain data
+wipe-blockchain: ## delete all blockchain data
 	$(call ANSIPLAY, delete-blockchain.yaml)
 
 start-signers: DOCKER_IMAGE ?= ""
@@ -99,22 +99,26 @@ list-addresses: inventory ## list all app public addressess
 	@echo
 
 init-genesis: inventory ## initialize genesis on all nodes
-	$(if $(wildcard genesis.json),,$(error Genesis file not found))
+	$(if $(wildcard ../data/genesis.json),,$(error Genesis file not found))
+	make remote-copy FILE=../data/genesis.json
 	$(call ANSIPLAY, init-genesis.yaml)
 
-init-bootnodes: inventory ## generate bootnodes from signer ENR addresses
+create-bootnodes: inventory ## create current list of bootnodes
+	$(call ANSIPLAY, create-bootnodes.yaml)
+	@bash ./join_enodes.sh
+	$(info Bootnode enodes entries created in bootnodes.csv)
+
+
+# obsolete
+init-bootnodes: inventory # generate bootnodes from signer ENR addresses
 	$(call ANSIPLAY, init-bootnodes.yaml)
 	bash ./join_enodes.sh
 	#make upload-bootnodes
-
-update-bootnodes: inventory ## generate bootnodes from signer ENR addresses
+update-bootnodes: inventory # generate bootnodes from signer ENR addresses
 	$(call ANSIPLAY, update-bootnodes.yaml)
 	bash ./join_enodes.sh
-
-init-bootnodes-steps: steps
-
 upload-bootnodes: IPS := $(shell hcloud server list -o noheader -o columns=ipv4 | xargs)
-upload-bootnodes: ## upload bootnodes.csv (used by init-bootnodes)
+upload-bootnodes: # upload bootnodes.csv (used by init-bootnodes)
 	$(if $(wildcard bootnodes.csv),,$(error Bootnodes file not found))
 	for i in ${IPS}; do scp -i ./sshkey \
 	  -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes \
@@ -161,11 +165,6 @@ install-firewall: inventory ## setup firewall rules on all nodes (API_ and SIGN_
 
 create-accounts: inventory ## create accounts on all servers
 	$(call ANSIPLAY, create-accounts.yaml)
-
-create-bootnodes: inventory ## create current list of bootnodes
-	$(call ANSIPLAY, create-bootnodes.yaml)
-	@bash ./join_enodes.sh
-	$(info Bootnode enodes entries created in bootnodes.csv)
 
 install-explorer: inventory ## install the block explorer on the api node
 	$(call ANSIPLAY, install-explorer.yaml)

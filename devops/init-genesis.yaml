@@ -5,10 +5,6 @@
   vars:
     ansible_remote_tmp: /tmp
   tasks:
-  - name: copy genesis file on machine
-    copy:
-      src: genesis.json
-      dest: ~/dyneth/data
 
   - name: Check genesis initialization
     shell: test -r ~/dyneth/data/geth/chaindata/CURRENT && echo "GenesisInitialized" || echo
