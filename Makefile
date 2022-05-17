@@ -184,11 +184,13 @@ restore: init ## ask for private account JSON to restore backup
 	@bash ./scripts/account.sh restore
 
 ##@ Genesis commands
+genesis-create: SIGNERS=""
+genesis-create: PARAM?="data/params_genesis.json"
 genesis-create: ## Create data/genesis.json from parameters in scripts/params_genesis.json
 	$(if $(wildcard data/genesis.json), $(error Cannot overwrite data/genesis.json))
-	$(if $(wildcard scripts/params_genesis.json),,\
-		$(error Genesis parameters not found in scripts/params_genesis.json))
-	@zenroom scripts/genesis.lua -a scripts/params_genesis.json | jq . | tee data/genesis.json
+	$(info Create config '${PARAM}')
+	@bash scripts/input-genesis.sh ${CONFIG} ${SIGNERS}>${PARAM}
+	@zenroom scripts/genesis.lua -a data/params_genesis.json | jq . | tee data/genesis.json
 	@echo
 	@echo "###########################"
 	@echo "now RUN: make genesis-init"

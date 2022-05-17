@@ -90,17 +90,23 @@ send-funds: ## Send an amount of funds from each signer to an address (default 1
 
 ##@ Genesis management
 
+genesis-create: SIGNERS=""
+genesis-create:
+	@make -C .. genesis-create SIGNERS=${SIGNERS}
+	@make init-genesis
+
 list-addresses: CMD := eth.accounts[0]
 list-addresses: inventory ## list all app public addressess
 	@echo; echo "### Signers:"
-	@make -s remote-shell CMD="make status 2>&1 | awk '/Public address/ {print $$3}'" ON=sign
+	@make -s remote-shell CMD="CONFIG=${CONFIG} make status 2>&1 | awk '/Public address/ {print $$3}'" ON=sign
 	@echo; echo; echo "### Api:"
-	@make -s remote-shell CMD="make status 2>&1 | awk '/Public address/ {print $$3}'" ON=api
+	@make -s remote-shell CMD="CONFIG=${CONFIG} make status 2>&1 | awk '/Public address/ {print $$3}'" ON=api
 	@echo
 
 init-genesis: inventory ## initialize genesis on all nodes
 	$(if $(wildcard ../data/genesis.json),,$(error Genesis file not found))
-	make remote-copy FILE=../data/genesis.json
+	make remote-copy FILE=../data/genesis.json ON=sing
+	make remote-copy FILE=../data/genesis.json ON=api
 	$(call ANSIPLAY, init-genesis.yaml)
 
 create-bootnodes: inventory ## create current list of bootnodes

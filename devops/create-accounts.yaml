@@ -5,6 +5,7 @@
   vars:
     geth_pass: "{{ lookup('password','/tmp/passfile length=64 chars=ascii_letters,digits') }}"
     dyneth_repo: "{{ lookup('env','DYNETH_REPO') or 'https://github.com/dyne/dyneth'}}"
+    blockchain: "{{ lookup('env','BLOCKCHAIN') or 'ebsi'}}"
     ansible_remote_tmp: /tmp
   tasks:
   - name: Check dyneth cloned
@@ -22,6 +23,6 @@
     changed_when: false
 
   - name: Create account
-    shell: cd dyneth && make account PASS={{ geth_pass }}
+    shell: cd dyneth && make account PASS={{ geth_pass }} CONFIG={{ blockchain }}
     register: geth_account_address
     when: dyneth_account.stdout != "DynethAccount"

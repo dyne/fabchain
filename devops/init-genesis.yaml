@@ -4,6 +4,7 @@
   remote_user: app
   vars:
     ansible_remote_tmp: /tmp
+    config: "{{ lookup('env','CONFIG') or 'ebsi'}}"
   tasks:
 
   - name: Check genesis initialization
@@ -12,7 +13,7 @@
     changed_when: false
 
   - name: Initialize data/genesis.json
-    command: make genesis-init
+    shell: CONFIG={{ config }} make genesis-init
     args:
       chdir: ~/dyneth
     when: genesis_initialized.stdout != "GenesisInitialized"
