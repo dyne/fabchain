@@ -21,7 +21,8 @@ case "$1" in
   api) cat <<EOF >data/api.toml
 [Eth]
 NetworkId = $network_id
-SyncMode = "snap"
+SyncMode = "full"
+NoPruning = true
 
 [Node]
 DataDir = "/home/geth/.ethereum"
@@ -30,7 +31,7 @@ HTTPHost = "0.0.0.0"
 HTTPPort = $port
 HTTPVirtualHosts = ["*"]
 HTTPCors = ["*"]
-HTTPModules = ["net", "web3", "eth", "personal"]
+HTTPModules = ["net", "web3", "eth", "personal", "debug", "parity", "pubsub", "trace"]
 WSOrigins = ["*"]
 WSHost = "0.0.0.0"
 
