@@ -21,6 +21,31 @@ case "$1" in
   api) cat <<EOF >data/api.toml
 [Eth]
 NetworkId = $network_id
+SyncMode = "snap"
+
+[Node]
+DataDir = "/home/geth/.ethereum"
+IPCPath = "geth.ipc"
+HTTPHost = "0.0.0.0"
+HTTPPort = $port
+HTTPVirtualHosts = ["*"]
+HTTPCors = ["*"]
+HTTPModules = ["net", "web3", "eth", "personal"]
+WSOrigins = ["*"]
+WSHost = "0.0.0.0"
+
+[Node.P2P]
+ListenAddr = ":$port_p2p"
+NoDiscovery = true
+BootstrapNodes = [$bootnodes]
+BootstrapNodesV5 = [$bootnodes]
+StaticNodes = [$bootnodes]
+TrustedNodes = [$bootnodes]
+EOF
+  ;;
+  api-priv) cat <<EOF >data/api.toml
+[Eth]
+NetworkId = $network_id
 SyncMode = "full"
 NoPruning = true
 

@@ -6,6 +6,7 @@
     geth_pass: "{{ lookup('password','/tmp/passfile length=64 chars=ascii_letters,digits') }}"
     dyneth_repo: "{{ lookup('env','DYNETH_REPO') or 'https://github.com/dyne/dyneth'}}"
     ansible_remote_tmp: /tmp
+    visibility: public
   tasks:
   - name: Check dyneth cloned
     shell: test -d ~/dyneth && echo "DynethCloned" || echo
@@ -16,12 +17,24 @@
     shell: git clone {{ dyneth_repo }} dyneth \
     when: dyneth_cloned.stdout != "DynethCloned"
 
+  - name: Pull dyneth
+    shell: git pull
+    args:
+      chdir: ~/dyneth
+
+  - name: Create config
+    shell: >
+      make create-config CONFIG={{ config }}
+       NODE={{ node }}{% if visibility == "private" %}-priv{% endif %}
+    args:
+      chdir: ~/dyneth
+
   - name: Check dyneth account
     shell: test -d /home/app/dyneth/data/keystore && echo "DynethAccount" || echo
     register: dyneth_account
     changed_when: false
 
   - name: Create account
-    shell: cd dyneth && make account PASS={{ geth_pass }}
+    shell: cd dyneth && make account PASS={{ geth_pass }} CONFIG={{ config }}
     register: geth_account_address
     when: dyneth_account.stdout != "DynethAccount"

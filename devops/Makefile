@@ -63,10 +63,11 @@ remote-shell: ## execute a shell command on all signers
 	done
 
 create-config:
-	make remote-shell CMD='make create-config NODE=sign' ON=sign-1
-	make remote-shell CMD='make create-config NODE=sign' ON=sign-2
-	make remote-shell CMD='make create-config NODE=sign' ON=sign-3
-	make remote-shell CMD='make create-config NODE=api' ON=api
+	make remote-shell CMD='make create-config CONFIG=${CONFIG} NODE=sign' ON=sign-1
+	make remote-shell CMD='make create-config CONFIG=${CONFIG} NODE=sign' ON=sign-2
+	make remote-shell CMD='make create-config CONFIG=${CONFIG} NODE=sign' ON=sign-3
+	make remote-shell CMD='make create-config CONFIG=${CONFIG} NODE=api' ON=api
+	make remote-shell CMD='make create-config CONFIG=${CONFIG} NODE=api-priv' ON=api-priv
 
 
 remote-copy: ON ?= sign
@@ -145,10 +146,10 @@ inventory:
 inventory: ## create an ansible inventory (used internally)
 	@echo "[sign]" > hosts.toml
 	@hcloud server list -o noheader -o columns=name,ipv4 \
-	| awk '/sign/{print $$2}' >> hosts.toml
+	| awk '/sign/{printf "%s node=sign config=${CONFIG}\n", $$2}' >> hosts.toml
 	@echo "[api]" >> hosts.toml
 	@hcloud server list -o noheader -o columns=name,ipv4 \
-	| awk '/api/{print $$2}' >> hosts.toml
+	| awk '/api/{printf "%s%s node=api config=${CONFIG}\n", $$2, ($$1 ~ /priv/) ? " visibility=private" : ""}' >> hosts.toml
 
 install: ssh-keygen inventory
 install: ## install all servers
@@ -181,7 +182,7 @@ server-list: ## print a list of servers and their status
 ssh: HOST ?= api
 ssh: LOGIN ?= app
 ssh: ## open an ssh session on HOST=name (see make server-list)
-	@ssh $(shell hcloud server list -o noheader -o columns=name,ipv4 | awk '/${HOST}/{print $$2}') \
+	@ssh $(shell hcloud server list -o noheader -o columns=name,ipv4 | awk '/${HOST} /{print $$2}') \
 	 -l ${LOGIN} -i ./sshkey -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes
 
 server-cmd: CMD ?= describe
