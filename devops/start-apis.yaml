@@ -5,10 +5,10 @@
   vars:
     ansible_remote_tmp: /tmp
   tasks:
-  - command: make stop
+  - command: make stop CONFIG={{ config }}
     args:
       chdir: ~/dyneth
     ignore_errors: yes # Node could be already stopped
-  - command: make run
+  - command: make run CONFIG={{ config }}
     args:
       chdir: ~/dyneth

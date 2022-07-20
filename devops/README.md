@@ -45,3 +45,10 @@ Server management
   server-cmd       execute an hcloud server command on all nodes
   list-uptimes     list all server uptimes
 ```
+
+# How to start an API node
+1. `make install`
+1. `make create-accounts`
+1. `make create-bootnodes`
+1. `make remote-copy ON=api`
+1. `make start-apis`

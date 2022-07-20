@@ -6,7 +6,6 @@
     geth_pass: "{{ lookup('password','/tmp/passfile length=64 chars=ascii_letters,digits') }}"
     dyneth_repo: "{{ lookup('env','DYNETH_REPO') or 'https://github.com/dyne/dyneth'}}"
     ansible_remote_tmp: /tmp
-    visibility: public
   tasks:
   - name: Check dyneth cloned
     shell: test -d ~/dyneth && echo "DynethCloned" || echo
@@ -24,8 +23,7 @@
 
   - name: Create config
     shell: >
-      make create-config CONFIG={{ config }}
-       NODE={{ node }}{% if visibility == "private" %}-priv{% endif %}
+      make create-config CONFIG={{ config }} NODE={{ node }}
     args:
       chdir: ~/dyneth
 

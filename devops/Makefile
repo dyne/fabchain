@@ -149,7 +149,7 @@ inventory: ## create an ansible inventory (used internally)
 	| awk '/sign/{printf "%s node=sign config=${CONFIG}\n", $$2}' >> hosts.toml
 	@echo "[api]" >> hosts.toml
 	@hcloud server list -o noheader -o columns=name,ipv4 \
-	| awk '/api/{printf "%s%s node=api config=${CONFIG}\n", $$2, ($$1 ~ /priv/) ? " visibility=private" : ""}' >> hosts.toml
+	| awk '/api/{printf "%s node=%s config=${CONFIG}\n", $$2, $$1}' >> hosts.toml
 
 install: ssh-keygen inventory
 install: ## install all servers

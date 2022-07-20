@@ -12,7 +12,7 @@
       seconds: 2
 
   - name: Generate enode
-    command: make command CMD=admin.nodeInfo.enode
+    command: make command CMD=admin.nodeInfo.enode CONFIG={{ config }}
     register: enode
     args:
       chdir: ~/dyneth
