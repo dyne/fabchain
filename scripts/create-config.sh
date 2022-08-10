@@ -56,9 +56,10 @@ HTTPHost = "0.0.0.0"
 HTTPPort = $port
 HTTPVirtualHosts = ["*"]
 HTTPCors = ["*"]
-HTTPModules = ["net", "web3", "eth", "personal", "debug", "parity", "pubsub", "trace"]
+HTTPModules = ["debug", "net", "eth", "shh", "web3", "txpool"]
 WSOrigins = ["*"]
 WSHost = "0.0.0.0"
+WSModules = ["eth", "net","web3", "network", "debug", "txpool"]
 
 [Node.P2P]
 ListenAddr = ":$port_p2p"
