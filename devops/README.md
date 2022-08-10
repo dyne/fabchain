@@ -51,4 +51,6 @@ Server management
 1. `make create-accounts`
 1. `make create-bootnodes`
 1. `make remote-copy ON=api`
+1. Copy genesis file
+1. `make create-config`
 1. `make start-apis`

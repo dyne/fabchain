@@ -12,7 +12,7 @@
     changed_when: false
 
   - name: Initialize data/genesis.json
-    command: make genesis-init
+    command: make genesis-init CONFIG={{ config }}
     args:
       chdir: ~/dyneth
     when: genesis_initialized.stdout != "GenesisInitialized"

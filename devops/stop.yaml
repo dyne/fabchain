@@ -6,7 +6,7 @@
     ansible_remote_tmp: /tmp
   tasks:
   - name: Stop geth
-    command: make stop
+    command: make stop CONFIG={{ config }}
     ignore_errors: true
     args:
       chdir: ~/dyneth

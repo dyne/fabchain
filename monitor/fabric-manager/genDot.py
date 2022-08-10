@@ -15,7 +15,7 @@ load_dotenv()
 def getConnections(ip: str) -> list[str]:
     with Connection(ip, user="app", connect_kwargs={'key_filename': ['../../devops/sshkey']}) as conn:
         with conn.cd('~/dyneth/'):
-            result = conn.run('make command CMD="admin.peers"', hide=True)
+            result = conn.run('make command CMD="admin.peers" CONFIG=fabchain', hide=True)
             peers = re.sub(r'[^a-zA-Z0-9".:\/@]([a-zA-Z0-9.]+)(?!^"):(?!^")', r'"\1":', result.stdout)
             peers = json.loads(peers, strict=False)
             # Show only ips

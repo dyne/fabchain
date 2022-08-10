@@ -21,7 +21,7 @@
       state: latest
 
   - name: read contract address
-    shell: /bin/bash -c "cd {{ network_path }} && make backup-secret | awk '{ print $2 }'"
+    shell: /bin/bash -c "cd {{ network_path }} && CONFIG={{ config }} make backup-secret | awk '{ print $2 }'"
     register: sk
 
   - debug: 
